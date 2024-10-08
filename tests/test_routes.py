@@ -15,7 +15,7 @@
 ######################################################################
 
 """
-TestYourResourceModel API Service Test Suite
+Test Recommendation API Service Test Suite
 """
 
 # pylint: disable=duplicate-code
@@ -24,19 +24,21 @@ import logging
 from unittest import TestCase
 from wsgi import app
 from service.common import status
-from service.models import db, YourResourceModel
+from service.models import db, RecommendationModel
+from .factories import RecommendationFactory
 
 DATABASE_URI = os.getenv(
     "DATABASE_URI", "postgresql+psycopg://postgres:postgres@localhost:5432/testdb"
 )
+BASE_URL = "/recommendations"
 
 
 ######################################################################
 #  T E S T   C A S E S
 ######################################################################
 # pylint: disable=too-many-public-methods
-class TestYourResourceService(TestCase):
-    """REST API Server Tests"""
+class TestRecommendationService(TestCase):
+    """REST API Server Tests for Recommendations"""
 
     @classmethod
     def setUpClass(cls):
@@ -56,7 +58,7 @@ class TestYourResourceService(TestCase):
     def setUp(self):
         """Runs before each test"""
         self.client = app.test_client()
-        db.session.query(YourResourceModel).delete()  # clean up the last tests
+        db.session.query(RecommendationModel).delete()  # clean up the last tests
         db.session.commit()
 
     def tearDown(self):
@@ -72,4 +74,30 @@ class TestYourResourceService(TestCase):
         resp = self.client.get("/")
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
 
-    # Todo: Add your test cases here...
+    # ----------------------------------------------------------
+    # TEST CREATE RECOMMENDATION
+    # ----------------------------------------------------------
+    def test_create_recommendation(self):
+        """It should Create a new Recommendation"""
+        test_recommendation = RecommendationFactory()
+        logging.debug("Test Recommendation: %s", test_recommendation.serialize())
+        response = self.client.post(BASE_URL, json=test_recommendation.serialize())
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        # Make sure location header is set
+        location = response.headers.get("Location", None)
+        self.assertIsNotNone(location)
+
+        # Check the data is correct
+        new_recommendation = response.get_json()
+        self.assertEqual(new_recommendation["user_id"], test_recommendation.user_id)
+        self.assertEqual(new_recommendation["product_id"], test_recommendation.product_id)
+        self.assertAlmostEqual(new_recommendation["score"], test_recommendation.score, places=2)
+
+        # Check that the location header was correct
+        response = self.client.get(location)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        new_recommendation = response.get_json()
+        self.assertEqual(new_recommendation["user_id"], test_recommendation.user_id)
+        self.assertEqual(new_recommendation["product_id"], test_recommendation.product_id)
+        self.assertAlmostEqual(new_recommendation["score"], test_recommendation.score, places=2)
