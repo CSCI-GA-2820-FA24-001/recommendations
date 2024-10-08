@@ -15,16 +15,17 @@
 ######################################################################
 
 """
-Test cases for Pet Model
+Test cases for Recommendation Model
 """
 
 # pylint: disable=duplicate-code
 import os
 import logging
 from unittest import TestCase
+from unittest.mock import patch
 from wsgi import app
-from service.models import YourResourceModel, DataValidationError, db
-from .factories import YourResourceModelFactory
+from service.models import RecommendationModel, DataValidationError, db
+from .factories import RecommendationFactory
 
 DATABASE_URI = os.getenv(
     "DATABASE_URI", "postgresql+psycopg://postgres:postgres@localhost:5432/testdb"
@@ -32,11 +33,10 @@ DATABASE_URI = os.getenv(
 
 
 ######################################################################
-#  YourResourceModel   M O D E L   T E S T   C A S E S
+#  R E C O M M E N D A T I O N   M O D E L   T E S T   C A S E S
 ######################################################################
-# pylint: disable=too-many-public-methods
-class TestYourResourceModel(TestCase):
-    """Test Cases for YourResourceModel Model"""
+class TestRecommendationModel(TestCase):
+    """Test Cases for RecommendationModel"""
 
     @classmethod
     def setUpClass(cls):
@@ -54,7 +54,7 @@ class TestYourResourceModel(TestCase):
 
     def setUp(self):
         """This runs before each test"""
-        db.session.query(YourResourceModel).delete()  # clean up the last tests
+        db.session.query(RecommendationModel).delete()  # clean up the last tests
         db.session.commit()
 
     def tearDown(self):
@@ -65,15 +65,18 @@ class TestYourResourceModel(TestCase):
     #  T E S T   C A S E S
     ######################################################################
 
-    def test_example_replace_this(self):
-        """It should create a YourResourceModel"""
-        # Todo: Remove this test case example
-        resource = YourResourceModelFactory()
-        resource.create()
-        self.assertIsNotNone(resource.id)
-        found = YourResourceModel.all()
-        self.assertEqual(len(found), 1)
-        data = YourResourceModel.find(resource.id)
-        self.assertEqual(data.name, resource.name)
-
-    # Todo: Add your test cases here...
+    def test_create_a_recommendation(self):
+        """It should Create a recommendation and assert that it exists"""
+        from datetime import datetime
+        recommendation = RecommendationModel(
+            user_id=123,
+            product_id=456,
+            score=4.5,
+            timestamp=datetime.now()
+        )
+        
+        self.assertTrue(recommendation is not None)
+        self.assertEqual(recommendation.user_id, 123)
+        self.assertEqual(recommendation.product_id, 456)
+        self.assertEqual(recommendation.score, 4.5)
+        self.assertIsNotNone(recommendation.timestamp)
