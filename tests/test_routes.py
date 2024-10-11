@@ -101,3 +101,31 @@ class TestRecommendationService(TestCase):
         self.assertEqual(new_recommendation["user_id"], test_recommendation.user_id)
         self.assertEqual(new_recommendation["product_id"], test_recommendation.product_id)
         self.assertAlmostEqual(new_recommendation["score"], test_recommendation.score, places=2)
+
+    # ----------------------------------------------------------
+    # TEST UPDATE RECOMMENDATION
+    # ----------------------------------------------------------
+    def test_update_recommendation(self):
+        """It should Update an existing Recommendation"""
+        # Create a recommendation to update
+        test_recommendation = RecommendationFactory()
+        response = self.client.post(BASE_URL, json=test_recommendation.serialize())
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        # Retrieve the recommendation from the response
+        created_recommendation = response.get_json()
+        recommendation_id = created_recommendation["id"]
+
+        # Update the recommendation
+        updated_recommendation = created_recommendation
+        updated_recommendation["score"] = 4.9  # Change the score as an example update
+
+        # Send the PUT request to update the recommendation
+        response = self.client.put(f"{BASE_URL}/{recommendation_id}", json=updated_recommendation)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # Retrieve the updated recommendation and verify the change
+        response = self.client.get(f"{BASE_URL}/{recommendation_id}")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        updated_data = response.get_json()
+        self.assertEqual(updated_data["score"], 4.9)
