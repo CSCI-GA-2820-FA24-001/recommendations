@@ -43,6 +43,7 @@ def index():
 #  R E S T   A P I   E N D P O I N T S
 ######################################################################
 
+
 ######################################################################
 # CREATE A NEW RECOMMENDATION
 ######################################################################
@@ -66,8 +67,14 @@ def create_recommendation():
     app.logger.info("Recommendation with new id [%s] saved!", recommendation.id)
 
     # Return the location of the new Recommendation
-    location_url = url_for("get_recommendation", recommendation_id=recommendation.id, _external=True)
-    return jsonify(recommendation.serialize()), status.HTTP_201_CREATED, {"Location": location_url}
+    location_url = url_for(
+        "get_recommendation", recommendation_id=recommendation.id, _external=True
+    )
+    return (
+        jsonify(recommendation.serialize()),
+        status.HTTP_201_CREATED,
+        {"Location": location_url},
+    )
 
 
 ######################################################################
@@ -79,11 +86,16 @@ def get_recommendation(recommendation_id):
     Retrieve a Recommendation
     This endpoint will return a Recommendation based on its id
     """
-    app.logger.info("Request to Retrieve a Recommendation with id [%s]", recommendation_id)
+    app.logger.info(
+        "Request to Retrieve a Recommendation with id [%s]", recommendation_id
+    )
 
     recommendation = RecommendationModel.find(recommendation_id)
     if not recommendation:
-        abort(status.HTTP_404_NOT_FOUND, f"Recommendation with id [{recommendation_id}] not found.")
+        abort(
+            status.HTTP_404_NOT_FOUND,
+            f"Recommendation with id [{recommendation_id}] not found.",
+        )
 
     return jsonify(recommendation.serialize()), status.HTTP_200_OK
 
@@ -97,12 +109,17 @@ def update_recommendation(recommendation_id):
     Update a Recommendation
     This endpoint will update a Recommendation based on the posted data
     """
-    app.logger.info("Request to Update a Recommendation with id [%s]", recommendation_id)
+    app.logger.info(
+        "Request to Update a Recommendation with id [%s]", recommendation_id
+    )
     check_content_type("application/json")
 
     recommendation = RecommendationModel.find(recommendation_id)
     if not recommendation:
-        abort(status.HTTP_404_NOT_FOUND, f"Recommendation with id [{recommendation_id}] not found.")
+        abort(
+            status.HTTP_404_NOT_FOUND,
+            f"Recommendation with id [{recommendation_id}] not found.",
+        )
 
     # Get the data from the request and deserialize it
     data = request.get_json()
@@ -116,17 +133,30 @@ def update_recommendation(recommendation_id):
 ######################################################################
 # DELETE A RECOMMENDATION
 ######################################################################
-@app.route("/recommendations/<int:recommendation_id>", methods=["DELETE"])
-def delete_recommendation(recommendation_id):
+@app.route("/recommendations/<id>", methods=["DELETE"])
+def delete_recommendation(id):
     """
     Delete a Recommendation
     This endpoint will delete a Recommendation based on its id
     """
-    app.logger.info("Request to Delete a Recommendation with id [%s]", recommendation_id)
+    app.logger.info("Request to Delete a Recommendation with id [%s]", id)
 
+    # Check if the id is a valid integer
+    if not id.isdigit():
+        app.logger.error("Invalid ID format: [%s]", id)
+        return {"error": "Invalid ID format"}, status.HTTP_400_BAD_REQUEST
+
+    # Convert the ID to integer and try to find the recommendation
+    recommendation_id = int(id)
     recommendation = RecommendationModel.find(recommendation_id)
-    if recommendation:
-        recommendation.delete()
+
+    if recommendation is None:
+        app.logger.error("Recommendation with id [%s] not found", recommendation_id)
+        return {"error": "Recommendation not found"}, status.HTTP_404_NOT_FOUND
+
+    # Proceed with the deletion if recommendation is found
+    recommendation.delete()
+    app.logger.info("Recommendation with id [%s] has been deleted", recommendation_id)
 
     return "", status.HTTP_204_NO_CONTENT
 
@@ -134,6 +164,7 @@ def delete_recommendation(recommendation_id):
 ######################################################################
 #  U T I L I T Y   F U N C T I O N S
 ######################################################################
+
 
 ######################################################################
 # Checks the ContentType of a request
