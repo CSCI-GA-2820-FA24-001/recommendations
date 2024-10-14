@@ -80,3 +80,77 @@ class TestRecommendationModel(TestCase):
         self.assertEqual(recommendation.product_id, 456)
         self.assertEqual(recommendation.score, 4.5)
         self.assertIsNotNone(recommendation.timestamp)
+    
+    def test_serialize_a_recommendation(self):
+        """It should serialize a recommendation into a dictionary"""
+        from datetime import datetime
+        recommendation = RecommendationModel(
+            user_id=123,
+            product_id=456,
+            score=4.5,
+            timestamp=datetime.now()
+        )
+        serial_recommendation = recommendation.serialize()
+        
+        self.assertEqual(serial_recommendation["user_id"], 123)
+        self.assertEqual(serial_recommendation["product_id"], 456)
+        self.assertEqual(serial_recommendation["score"], 4.5)
+        self.assertIsNotNone(serial_recommendation["timestamp"])
+        self.assertEqual(serial_recommendation["id"], None)  # Since it hasn't been saved to DB yet
+    
+    def test_update_a_recommendation(self):
+        """It should update a recommendation in the database"""
+        from datetime import datetime
+        recommendation = RecommendationModel(
+            user_id=123,
+            product_id=456,
+            score=4.5,
+            timestamp=datetime.now()
+        )
+        recommendation.create()
+
+        # Update the score and product_id
+        recommendation.score = 4.9
+        recommendation.product_id = 789
+        recommendation.update()
+
+        # Fetch the updated recommendation
+        updated_recommendation = RecommendationModel.find(recommendation.id)
+        
+        self.assertEqual(updated_recommendation.product_id, 789)
+        self.assertEqual(updated_recommendation.score, 4.9)
+
+    def test_delete_a_recommendation(self):
+        """It should delete a recommendation from the database"""
+        from datetime import datetime
+        recommendation = RecommendationModel(
+            user_id=123,
+            product_id=456,
+            score=4.5,
+            timestamp=datetime.now()
+        )
+        recommendation.create()
+
+        # Delete the recommendation
+        recommendation.delete()
+
+        # Try to retrieve the deleted recommendation
+        deleted_recommendation = RecommendationModel.find(recommendation.id)
+        
+        self.assertIsNone(deleted_recommendation)
+
+    def test_deserialize_a_recommendation(self):
+        """It should deserialize a recommendation from a dictionary"""
+        data = {
+            "user_id": 123,
+            "product_id": 456,
+            "score": 4.5,
+            "timestamp": "2024-10-14T12:00:00Z"
+        }
+        recommendation = RecommendationModel()
+        recommendation.deserialize(data)
+
+        self.assertEqual(recommendation.user_id, 123)
+        self.assertEqual(recommendation.product_id, 456)
+        self.assertEqual(recommendation.score, 4.5)
+        self.assertIsNotNone(recommendation.timestamp)
