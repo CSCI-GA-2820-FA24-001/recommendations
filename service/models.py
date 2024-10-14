@@ -12,8 +12,10 @@ logger = logging.getLogger("flask.app")
 # Create the SQLAlchemy object to be initialized later in init_db()
 db = SQLAlchemy()
 
+
 class DataValidationError(Exception):
     """Used for data validation errors when deserializing"""
+
 
 class RecommendationModel(db.Model):
     """
@@ -24,10 +26,16 @@ class RecommendationModel(db.Model):
     # Table Schema
     ##################################################
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, nullable=False)  # ID of the user receiving the recommendation
+    user_id = db.Column(
+        db.Integer, nullable=False
+    )  # ID of the user receiving the recommendation
     product_id = db.Column(db.Integer, nullable=False)  # ID of the recommended product
-    score = db.Column(db.Float, nullable=False)  # Score representing recommendation confidence
-    timestamp = db.Column(db.DateTime, nullable=False)  # Timestamp when the recommendation was made
+    score = db.Column(
+        db.Float, nullable=False
+    )  # Score representing recommendation confidence
+    timestamp = db.Column(
+        db.DateTime, nullable=False
+    )  # Timestamp when the recommendation was made
 
     def __repr__(self):
         return f"<Recommendation user_id={self.user_id}, product_id={self.product_id}, score={self.score}>"
@@ -36,7 +44,11 @@ class RecommendationModel(db.Model):
         """
         Creates a Recommendation in the database
         """
-        logger.info("Creating recommendation for user_id=%s, product_id=%s", self.user_id, self.product_id)
+        logger.info(
+            "Creating recommendation for user_id=%s, product_id=%s",
+            self.user_id,
+            self.product_id,
+        )
         self.id = None  # pylint: disable=invalid-name
         try:
             db.session.add(self)
@@ -50,7 +62,11 @@ class RecommendationModel(db.Model):
         """
         Updates a Recommendation in the database
         """
-        logger.info("Updating recommendation for user_id=%s, product_id=%s", self.user_id, self.product_id)
+        logger.info(
+            "Updating recommendation for user_id=%s, product_id=%s",
+            self.user_id,
+            self.product_id,
+        )
         try:
             db.session.commit()
         except Exception as e:
@@ -60,7 +76,11 @@ class RecommendationModel(db.Model):
 
     def delete(self):
         """Removes a Recommendation from the data store"""
-        logger.info("Deleting recommendation for user_id=%s, product_id=%s", self.user_id, self.product_id)
+        logger.info(
+            "Deleting recommendation for user_id=%s, product_id=%s",
+            self.user_id,
+            self.product_id,
+        )
         try:
             db.session.delete(self)
             db.session.commit()
@@ -76,7 +96,7 @@ class RecommendationModel(db.Model):
             "user_id": self.user_id,
             "product_id": self.product_id,
             "score": self.score,
-            "timestamp": self.timestamp
+            "timestamp": self.timestamp,
         }
 
     def deserialize(self, data):
