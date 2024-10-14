@@ -1,16 +1,13 @@
-Here is the complete markdown code for the entire `README.md` file:
-
-```markdown
-# Recommendations Service
+# NYU DevOps Project Template
 
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Python](https://img.shields.io/badge/Language-Python-blue.svg)](https://python.org/)
 
-This project implements a recommendation service API that provides Create, Read, Update, and Delete (CRUD) operations for product recommendations. The service is built using Flask and SQLAlchemy.
+This is a skeleton you can use to start your projects
 
 ## Overview
 
-This service allows users to interact with recommendations in an online shopping environment. Recommendations can be created, retrieved by ID, updated, and deleted. The `/service` folder contains the `models.py` file for the recommendation model and `routes.py` file for the service endpoints.
+This project template contains starter code for your class project. The `/service` folder contains your `models.py` file for your model and a `routes.py` file for your service. The `/tests` folder has test case starter code for testing the model and the service separately. All you need to do is add your functionality. You can use the [lab-flask-tdd](https://github.com/nyu-devops/lab-flask-tdd) for code examples to copy from.
 
 ## Automatic Setup
 
@@ -37,7 +34,7 @@ The project contains the following:
 ```text
 .gitignore          - this will ignore vagrant and other metadata files
 .flaskenv           - Environment variables to configure Flask
-.gitattributes      - File to fix Windows CRLF issues
+.gitattributes      - File to gix Windows CRLF issues
 .devcontainers/     - Folder with support for VSCode Remote Containers
 dot-env-example     - copy to .env to use environment variables
 pyproject.toml      - Poetry list of Python libraries required by your code
@@ -59,114 +56,6 @@ tests/                     - test cases package
 ├── test_cli_commands.py   - test suite for the CLI
 ├── test_models.py         - test suite for business models
 └── test_routes.py         - test suite for service routes
-```
-
----
-
-## API Endpoints
-
-### 1. Create a Recommendation
-
-- **Endpoint**: `/recommendations`  
-- **Method**: `POST`  
-- **Description**: Creates a new recommendation with the data provided in the request body.  
-- **Request Body**: 
-  ```json
-  {
-      "user_id": <int>,
-      "product_id": <int>,
-      "score": <float>,
-      "timestamp": <timestamp>
-  }
-  ```
-- **Response**:  
-  - **201 Created**: Returns the created recommendation and its location URL.
-
-### 2. Retrieve a Recommendation
-
-- **Endpoint**: `/recommendations/<int:recommendation_id>`  
-- **Method**: `GET`  
-- **Description**: Retrieves the recommendation with the specified ID.  
-- **Response**:  
-  - **200 OK**: Returns the recommendation details.
-  - **404 Not Found**: If the recommendation does not exist.
-
-### 3. Update a Recommendation
-
-- **Endpoint**: `/recommendations/<int:recommendation_id>`  
-- **Method**: `PUT`  
-- **Description**: Updates the recommendation with the specified ID using the data in the request body.  
-- **Request Body**: 
-  ```json
-  {
-      "user_id": <int>,
-      "product_id": <int>,
-      "score": <float>,
-      "timestamp": <timestamp>
-  }
-  ```
-- **Response**:  
-  - **200 OK**: Returns the updated recommendation.
-  - **404 Not Found**: If the recommendation does not exist.
-
-### 4. Delete a Recommendation
-
-- **Endpoint**: `/recommendations/<int:recommendation_id>`  
-- **Method**: `DELETE`  
-- **Description**: Deletes the recommendation with the specified ID.  
-- **Response**:  
-  - **204 No Content**: Indicates that the recommendation was deleted successfully.
-  - **404 Not Found**: If the recommendation does not exist.
-
----
-
-## Data Model
-
-The recommendation model contains the following fields:
-
-- `id`: Primary key (Integer)
-- `user_id`: The ID of the user receiving the recommendation (Integer)
-- `product_id`: The ID of the recommended product (Integer)
-- `score`: Confidence score for the recommendation (Float)
-- `timestamp`: The time the recommendation was made (DateTime)
-
-### Example Recommendation Object
-```json
-{
-    "id": 1,
-    "user_id": 123,
-    "product_id": 456,
-    "score": 0.95,
-    "timestamp": "2024-10-14T12:00:00Z"
-}
-```
-
----
-
-## Setup Instructions
-
-1. Clone the repository.
-2. Create a virtual environment and activate it:
-    ```bash
-    python3 -m venv venv
-    source venv/bin/activate
-    ```
-3. Install the required dependencies using Poetry or `pip`:
-    ```bash
-    pip install -r requirements.txt
-    ```
-4. Set up the environment variables by copying `.env-example` to `.env` and configuring your database URI.
-5. Run the application:
-    ```bash
-    flask run
-    ```
-
-
-## Testing
-
-Run the tests using `pytest`:
-```bash
-pytest
 ```
 
 ## License
