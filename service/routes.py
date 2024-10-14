@@ -43,6 +43,7 @@ def index():
 #  R E S T   A P I   E N D P O I N T S
 ######################################################################
 
+
 ######################################################################
 # CREATE A NEW RECOMMENDATION
 ######################################################################
@@ -66,8 +67,14 @@ def create_recommendation():
     app.logger.info("Recommendation with new id [%s] saved!", recommendation.id)
 
     # Return the location of the new Recommendation
-    location_url = url_for("get_recommendation", recommendation_id=recommendation.id, _external=True)
-    return jsonify(recommendation.serialize()), status.HTTP_201_CREATED, {"Location": location_url}
+    location_url = url_for(
+        "get_recommendation", recommendation_id=recommendation.id, _external=True
+    )
+    return (
+        jsonify(recommendation.serialize()),
+        status.HTTP_201_CREATED,
+        {"Location": location_url},
+    )
 
 
 ######################################################################
@@ -79,11 +86,16 @@ def get_recommendation(recommendation_id):
     Retrieve a Recommendation
     This endpoint will return a Recommendation based on its id
     """
-    app.logger.info("Request to Retrieve a Recommendation with id [%s]", recommendation_id)
+    app.logger.info(
+        "Request to Retrieve a Recommendation with id [%s]", recommendation_id
+    )
 
     recommendation = RecommendationModel.find(recommendation_id)
     if not recommendation:
-        abort(status.HTTP_404_NOT_FOUND, f"Recommendation with id [{recommendation_id}] not found.")
+        abort(
+            status.HTTP_404_NOT_FOUND,
+            f"Recommendation with id [{recommendation_id}] not found.",
+        )
 
     return jsonify(recommendation.serialize()), status.HTTP_200_OK
 
@@ -97,12 +109,17 @@ def update_recommendation(recommendation_id):
     Update a Recommendation
     This endpoint will update a Recommendation based on the posted data
     """
-    app.logger.info("Request to Update a Recommendation with id [%s]", recommendation_id)
+    app.logger.info(
+        "Request to Update a Recommendation with id [%s]", recommendation_id
+    )
     check_content_type("application/json")
 
     recommendation = RecommendationModel.find(recommendation_id)
     if not recommendation:
-        abort(status.HTTP_404_NOT_FOUND, f"Recommendation with id [{recommendation_id}] not found.")
+        abort(
+            status.HTTP_404_NOT_FOUND,
+            f"Recommendation with id [{recommendation_id}] not found.",
+        )
 
     # Get the data from the request and deserialize it
     data = request.get_json()
@@ -122,7 +139,9 @@ def delete_recommendation(recommendation_id):
     Delete a Recommendation
     This endpoint will delete a Recommendation based on its id
     """
-    app.logger.info("Request to Delete a Recommendation with id [%s]", recommendation_id)
+    app.logger.info(
+        "Request to Delete a Recommendation with id [%s]", recommendation_id
+    )
 
     recommendation = RecommendationModel.find(recommendation_id)
     if recommendation:
@@ -132,8 +151,42 @@ def delete_recommendation(recommendation_id):
 
 
 ######################################################################
+# LIST ALL RECOMMENDATIONS
+######################################################################
+@app.route("/recommendations", methods=["GET"])
+def list_recommendations():
+    """
+    List all Recommendations
+    This endpoint will return all Recommendations or filter them by query parameters
+    """
+    app.logger.info("Request for recommendation list")
+
+    recommendations = []
+
+    # Parse query parameters
+    user_id = request.args.get("user_id")
+    product_id = request.args.get("product_id")
+
+    if user_id:
+        app.logger.info("Find by user_id: %s", user_id)
+        recommendations = RecommendationModel.find_by_user(user_id)
+    elif product_id:
+        app.logger.info("Find by product_id: %s", product_id)
+        recommendations = RecommendationModel.find_by_product(product_id)
+    else:
+        app.logger.info("Find all")
+        recommendations = RecommendationModel.all()
+
+    # Serialize the results
+    results = [recommendation.serialize() for recommendation in recommendations]
+    app.logger.info("Returning %d recommendations", len(results))
+    return jsonify(results), status.HTTP_200_OK
+
+
+######################################################################
 #  U T I L I T Y   F U N C T I O N S
 ######################################################################
+
 
 ######################################################################
 # Checks the ContentType of a request

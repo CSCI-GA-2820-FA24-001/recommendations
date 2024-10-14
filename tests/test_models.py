@@ -68,15 +68,49 @@ class TestRecommendationModel(TestCase):
     def test_create_a_recommendation(self):
         """It should Create a recommendation and assert that it exists"""
         from datetime import datetime
+
         recommendation = RecommendationModel(
-            user_id=123,
-            product_id=456,
-            score=4.5,
-            timestamp=datetime.now()
+            user_id=123, product_id=456, score=4.5, timestamp=datetime.now()
         )
-        
+
         self.assertTrue(recommendation is not None)
         self.assertEqual(recommendation.user_id, 123)
         self.assertEqual(recommendation.product_id, 456)
         self.assertEqual(recommendation.score, 4.5)
         self.assertIsNotNone(recommendation.timestamp)
+
+    def test_list_all_recommendations(self):
+        """It should List all recommendations in the database"""
+        recommendations_list = RecommendationModel.all()
+        self.assertEqual(recommendations_list, [])
+        # Create 5 recommendations
+        for _ in range(5):
+            recommendation = RecommendationFactory()
+            recommendation.create()
+        # See if we get back 5 recommendations
+        recommendations = RecommendationModel.all()
+        self.assertEqual(len(recommendations), 5)
+
+    def test_find_by_user(self):
+        """It should Find recommendations by user_id"""
+        recommendation1 = RecommendationFactory(user_id=101)
+        recommendation2 = RecommendationFactory(user_id=102)
+        recommendation1.create()
+        recommendation2.create()
+
+        # Test finding by user_id
+        recommendations = RecommendationModel.find_by_user(101)
+        self.assertEqual(len(recommendations), 1)
+        self.assertEqual(recommendations[0].user_id, 101)
+
+    def test_find_by_product(self):
+        """It should Find recommendations by product_id"""
+        recommendation1 = RecommendationFactory(product_id=201)
+        recommendation2 = RecommendationFactory(product_id=202)
+        recommendation1.create()
+        recommendation2.create()
+
+        # Test finding by product_id
+        recommendations = RecommendationModel.find_by_product(201)
+        self.assertEqual(len(recommendations), 1)
+        self.assertEqual(recommendations[0].product_id, 201)

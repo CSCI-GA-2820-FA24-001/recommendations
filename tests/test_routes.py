@@ -91,16 +91,24 @@ class TestRecommendationService(TestCase):
         # Check the data is correct
         new_recommendation = response.get_json()
         self.assertEqual(new_recommendation["user_id"], test_recommendation.user_id)
-        self.assertEqual(new_recommendation["product_id"], test_recommendation.product_id)
-        self.assertAlmostEqual(new_recommendation["score"], test_recommendation.score, places=2)
+        self.assertEqual(
+            new_recommendation["product_id"], test_recommendation.product_id
+        )
+        self.assertAlmostEqual(
+            new_recommendation["score"], test_recommendation.score, places=2
+        )
 
         # Check that the location header was correct
         response = self.client.get(location)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         new_recommendation = response.get_json()
         self.assertEqual(new_recommendation["user_id"], test_recommendation.user_id)
-        self.assertEqual(new_recommendation["product_id"], test_recommendation.product_id)
-        self.assertAlmostEqual(new_recommendation["score"], test_recommendation.score, places=2)
+        self.assertEqual(
+            new_recommendation["product_id"], test_recommendation.product_id
+        )
+        self.assertAlmostEqual(
+            new_recommendation["score"], test_recommendation.score, places=2
+        )
 
     # ----------------------------------------------------------
     # TEST UPDATE RECOMMENDATION
@@ -121,7 +129,9 @@ class TestRecommendationService(TestCase):
         updated_recommendation["score"] = 4.9  # Change the score as an example update
 
         # Send the PUT request to update the recommendation
-        response = self.client.put(f"{BASE_URL}/{recommendation_id}", json=updated_recommendation)
+        response = self.client.put(
+            f"{BASE_URL}/{recommendation_id}", json=updated_recommendation
+        )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         # Retrieve the updated recommendation and verify the change
@@ -129,3 +139,33 @@ class TestRecommendationService(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         updated_data = response.get_json()
         self.assertEqual(updated_data["score"], 4.9)
+
+    ############################################################
+    # Utility function to bulk Recommendations
+    ############################################################
+    def _create_recommendations(self, count: int = 1) -> list:
+        """Factory method to create pets in bulk"""
+        recommendation_list = []
+        for _ in range(count):
+            test_recommendation = RecommendationFactory()
+            response = self.client.post(BASE_URL, json=test_recommendation.serialize())
+            self.assertEqual(
+                response.status_code,
+                status.HTTP_201_CREATED,
+                "Could not create recommendation",
+            )
+            new_recommendation = response.get_json()
+            test_recommendation.id = new_recommendation["id"]
+            recommendation_list.append(test_recommendation)
+        return recommendation_list
+
+    # ----------------------------------------------------------
+    # TEST LIST
+    # ----------------------------------------------------------
+    def test_get_recommendations_list(self):
+        """It should Get a list of recommendations"""
+        self._create_recommendations(5)
+        response = self.client.get(BASE_URL)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.get_json()
+        self.assertEqual(len(data), 5)
