@@ -6,6 +6,7 @@ All of the models are stored in this module
 
 import logging
 from flask_sqlalchemy import SQLAlchemy
+from datetime import datetime
 
 logger = logging.getLogger("flask.app")
 
@@ -44,12 +45,15 @@ class RecommendationModel(db.Model):
         """
         Creates a Recommendation in the database
         """
+        if self.timestamp is None:
+            self.timestamp = datetime.utcnow()  # Set default timestamp if not provided
+
         logger.info(
             "Creating recommendation for user_id=%s, product_id=%s",
             self.user_id,
             self.product_id,
         )
-        self.id = None  # pylint: disable=invalid-name
+        self.id = None
         try:
             db.session.add(self)
             db.session.commit()

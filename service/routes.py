@@ -133,54 +133,32 @@ def update_recommendation(recommendation_id):
 ######################################################################
 # DELETE A RECOMMENDATION
 ######################################################################
-@app.route("/recommendations/<int:recommendation_id>", methods=["DELETE"])
-def delete_recommendation(recommendation_id):
+@app.route("/recommendations/<id>", methods=["DELETE"])
+def delete_recommendation(id):
     """
     Delete a Recommendation
     This endpoint will delete a Recommendation based on its id
     """
-    app.logger.info(
-        "Request to Delete a Recommendation with id [%s]", recommendation_id
-    )
+    app.logger.info("Request to Delete a Recommendation with id [%s]", id)
 
+    # Check if the id is a valid integer
+    if not id.isdigit():
+        app.logger.error("Invalid ID format: [%s]", id)
+        return {"error": "Invalid ID format"}, status.HTTP_400_BAD_REQUEST
+
+    # Convert the ID to integer and try to find the recommendation
+    recommendation_id = int(id)
     recommendation = RecommendationModel.find(recommendation_id)
-    if recommendation:
-        recommendation.delete()
+
+    if recommendation is None:
+        app.logger.error("Recommendation with id [%s] not found", recommendation_id)
+        return {"error": "Recommendation not found"}, status.HTTP_404_NOT_FOUND
+
+    # Proceed with the deletion if recommendation is found
+    recommendation.delete()
+    app.logger.info("Recommendation with id [%s] has been deleted", recommendation_id)
 
     return "", status.HTTP_204_NO_CONTENT
-
-
-######################################################################
-# LIST ALL RECOMMENDATIONS
-######################################################################
-@app.route("/recommendations", methods=["GET"])
-def list_recommendations():
-    """
-    List all Recommendations
-    This endpoint will return all Recommendations or filter them by query parameters
-    """
-    app.logger.info("Request for recommendation list")
-
-    recommendations = []
-
-    # Parse query parameters
-    user_id = request.args.get("user_id")
-    product_id = request.args.get("product_id")
-
-    if user_id:
-        app.logger.info("Find by user_id: %s", user_id)
-        recommendations = RecommendationModel.find_by_user(user_id)
-    elif product_id:
-        app.logger.info("Find by product_id: %s", product_id)
-        recommendations = RecommendationModel.find_by_product(product_id)
-    else:
-        app.logger.info("Find all")
-        recommendations = RecommendationModel.all()
-
-    # Serialize the results
-    results = [recommendation.serialize() for recommendation in recommendations]
-    app.logger.info("Returning %d recommendations", len(results))
-    return jsonify(results), status.HTTP_200_OK
 
 
 ######################################################################
