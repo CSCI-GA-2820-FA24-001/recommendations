@@ -103,8 +103,20 @@ class TestRecommendationService(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         new_recommendation = response.get_json()
         self.assertEqual(new_recommendation["user_id"], test_recommendation.user_id)
-        self.assertEqual(new_recommendation["product_id"], test_recommendation.product_id)
-        self.assertAlmostEqual(new_recommendation["score"], test_recommendation.score, places=2)
+        self.assertEqual(
+            new_recommendation["product_id"], test_recommendation.product_id
+        )
+        self.assertAlmostEqual(
+            new_recommendation["score"], test_recommendation.score, places=2
+        )
+
+    def test_create_recommendation_with_invalid_content_type(self):
+        """It should not Create a new Recommendation with invalid Content-Type"""
+        test_recommendation = RecommendationFactory()
+        response = self.client.post(
+            BASE_URL, data=test_recommendation.serialize()
+        )  # Missing "json=" parameter
+        self.assertEqual(response.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
 
     def test_create_recommendation_with_invalid_content_type(self):
         """It should not Create a new Recommendation with invalid Content-Type"""
@@ -155,6 +167,7 @@ class TestRecommendationService(TestCase):
         self.assertEqual(updated_data["score"], 4.9)
 
     def test_update_recommendation_not_found(self):
+
         """It should return 404 when trying to update a non-existent Recommendation"""
         # Attempt to update a recommendation with an ID that doesn't exist
         non_existent_id = 9999
@@ -169,6 +182,7 @@ class TestRecommendationService(TestCase):
             json=updated_data,
             headers={"Content-Type": "application/json"}
         )
+
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     # ----------------------------------------------------------
@@ -180,6 +194,7 @@ class TestRecommendationService(TestCase):
         test_recommendation = RecommendationFactory()
         response = self.client.post(BASE_URL, json=test_recommendation.serialize())
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
 
         # Retrieve the ID of the newly created recommendation
         recommendation_id = response.get_json()["id"]
@@ -203,6 +218,7 @@ class TestRecommendationService(TestCase):
         response = self.client.delete("/recommendations/99999")  # Non-existent ID
         self.assertEqual(response.status_code, 404)
         self.assertIn("Recommendation not found", response.get_json()["error"])
+
 
     ############################################################
     # Utility function to bulk Recommendations
@@ -240,6 +256,7 @@ class TestRecommendationService(TestCase):
         # Now, retrieve the recommendation by ID
         response = self.client.get(f"{BASE_URL}/{recommendation_id}")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+
 
         # Verify the retrieved recommendation matches what we created
         retrieved_data = response.get_json()
