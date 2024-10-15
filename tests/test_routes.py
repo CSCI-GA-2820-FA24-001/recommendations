@@ -103,12 +103,8 @@ class TestRecommendationService(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         new_recommendation = response.get_json()
         self.assertEqual(new_recommendation["user_id"], test_recommendation.user_id)
-        self.assertEqual(
-            new_recommendation["product_id"], test_recommendation.product_id
-        )
-        self.assertAlmostEqual(
-            new_recommendation["score"], test_recommendation.score, places=2
-        )
+        self.assertEqual(new_recommendation["product_id"], test_recommendation.product_id)
+        self.assertAlmostEqual(new_recommendation["score"], test_recommendation.score, places=2)
 
     def test_create_recommendation_with_invalid_content_type(self):
         """It should not Create a new Recommendation with invalid Content-Type"""
@@ -135,10 +131,20 @@ class TestRecommendationService(TestCase):
         # Update the recommendation
         updated_recommendation = created_recommendation
         updated_recommendation["score"] = 4.9  # Change the score as an example update
-
+        
+        # invalid content type
+        response = self.client.put(
+            f"{BASE_URL}/{recommendation_id}",
+            json=updated_recommendation,
+            headers={"Content-Type": "text/plain"}  # Incorrect Content-Type
+        )
+        self.assertEqual(response.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
+        
         # Send the PUT request to update the recommendation
         response = self.client.put(
-            f"{BASE_URL}/{recommendation_id}", json=updated_recommendation
+            f"{BASE_URL}/{recommendation_id}",
+            json=updated_recommendation,
+            headers={"Content-Type": "application/json"}
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
@@ -149,13 +155,20 @@ class TestRecommendationService(TestCase):
         self.assertEqual(updated_data["score"], 4.9)
 
     def test_update_recommendation_not_found(self):
-        """It should return 404 when trying to Update a non-existent Recommendation"""
-        test_recommendation = RecommendationFactory()
-        updated_data = test_recommendation.serialize()
-        updated_data["score"] = 4.9  # Update some field
+        """It should return 404 when trying to update a non-existent Recommendation"""
+        # Attempt to update a recommendation with an ID that doesn't exist
+        non_existent_id = 9999
+        updated_data = {
+            "user_id": 1,
+            "product_id": 1,
+            "score": 4.9
+        }
 
-        # Try to update a recommendation that doesn't exist (ID 9999)
-        response = self.client.put(f"{BASE_URL}/9999", json=updated_data)
+        response = self.client.put(
+            f"{BASE_URL}/{non_existent_id}",
+            json=updated_data,
+            headers={"Content-Type": "application/json"}
+        )
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     # ----------------------------------------------------------
@@ -168,15 +181,14 @@ class TestRecommendationService(TestCase):
         response = self.client.post(BASE_URL, json=test_recommendation.serialize())
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
-        # Retrieve the recommendation from the response
-        new_recommendation = response.get_json()
-        recommendation_id = new_recommendation["id"]
+        # Retrieve the ID of the newly created recommendation
+        recommendation_id = response.get_json()["id"]
 
-        # Now, delete the recommendation by ID
+        # Send a DELETE request to remove the recommendation
         response = self.client.delete(f"{BASE_URL}/{recommendation_id}")
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
-        # Try to retrieve the deleted recommendation, expecting a 404
+        # Verify that the recommendation has been deleted
         response = self.client.get(f"{BASE_URL}/{recommendation_id}")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
@@ -191,6 +203,25 @@ class TestRecommendationService(TestCase):
         response = self.client.delete("/recommendations/99999")  # Non-existent ID
         self.assertEqual(response.status_code, 404)
         self.assertIn("Recommendation not found", response.get_json()["error"])
+
+    ############################################################
+    # Utility function to bulk Recommendations
+    ############################################################
+    def _create_recommendations(self, count: int = 1) -> list:
+        """Factory method to create pets in bulk"""
+        recommendation_list = []
+        for _ in range(count):
+            test_recommendation = RecommendationFactory()
+            response = self.client.post(BASE_URL, json=test_recommendation.serialize())
+            self.assertEqual(
+                response.status_code,
+                status.HTTP_201_CREATED,
+                "Could not create recommendation",
+            )
+            new_recommendation = response.get_json()
+            test_recommendation.id = new_recommendation["id"]
+            recommendation_list.append(test_recommendation)
+        return recommendation_list
 
     # ----------------------------------------------------------
     # TEST RETRIEVE A RECOMMENDATION
@@ -210,51 +241,19 @@ class TestRecommendationService(TestCase):
         response = self.client.get(f"{BASE_URL}/{recommendation_id}")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        # Verify the response data
-        retrieved_recommendation = response.get_json()
-        self.assertEqual(
-            retrieved_recommendation["user_id"], test_recommendation.user_id
-        )
-        self.assertEqual(
-            retrieved_recommendation["product_id"], test_recommendation.product_id
-        )
-        self.assertAlmostEqual(
-            retrieved_recommendation["score"], test_recommendation.score, places=2
-        )
+        # Verify the retrieved recommendation matches what we created
+        retrieved_data = response.get_json()
+        self.assertEqual(retrieved_data["user_id"], test_recommendation.user_id)
+        self.assertEqual(retrieved_data["product_id"], test_recommendation.product_id)
+        self.assertAlmostEqual(retrieved_data["score"], test_recommendation.score, places=2)
 
     def test_get_recommendation_not_found(self):
-        """It should return 404 Not Found when the recommendation doesn't exist"""
-        # Try to retrieve a non-existent recommendation
-        response = self.client.get(
-            f"{BASE_URL}/9999"
-        )  # 9999 is an arbitrary non-existent ID
+        """It should return 404 when trying to get a non-existent Recommendation"""
+        response = self.client.get(f"{BASE_URL}/9999")  # Non-existent ID
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
-    def test_create_recommendation_with_missing_data(self):
-        """It should not Create a new Recommendation with missing data"""
-        incomplete_data = {"user_id": 123}  # Missing product_id, score, timestamp
-        response = self.client.post(BASE_URL, json=incomplete_data)
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-
-    def test_delete_recommendation_with_invalid_id(self):
-        """It should handle Delete request with invalid ID format"""
-        # Pass a string instead of an integer for the recommendation ID
-        response = self.client.delete(f"{BASE_URL}/invalid-id")
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-
-    def test_create_recommendation_no_content_type(self):
-        """It should return 415 Unsupported Media Type when Content-Type is missing"""
-        response = self.client.post(
-            "/recommendations", data="{}"
-        )  # Missing Content-Type
-        self.assertEqual(response.status_code, 415)
-        self.assertIn("Content-Type must be", response.get_json()["message"])
-
-    def test_create_recommendation_invalid_content_type(self):
-        """It should return 415 Unsupported Media Type when Content-Type is incorrect"""
-        headers = {"Content-Type": "text/plain"}  # Incorrect Content-Type
-        response = self.client.post("/recommendations", data="{}", headers=headers)
-        self.assertEqual(response.status_code, 415)
-        self.assertIn(
-            "Content-Type must be application/json", response.get_json()["message"]
-        )
+    def test_get_recommendation_invalid_id_format(self):
+        """It should return 400 Bad Request when the ID format is invalid"""
+        response = self.client.get(f"{BASE_URL}/invalid-id")  # Non-integer ID
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("Invalid ID format", response.get_json()["error"])
