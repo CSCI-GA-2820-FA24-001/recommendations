@@ -1,16 +1,19 @@
 """
 Test Factory to make fake Recommendation objects for testing
 """
+
 from datetime import datetime
 import factory
-from factory.fuzzy import FuzzyChoice, FuzzyFloat
+from factory.fuzzy import FuzzyFloat
 from service.models import RecommendationModel
+
 
 class RecommendationFactory(factory.Factory):
     """Creates fake recommendations for testing"""
 
     class Meta:  # pylint: disable=too-few-public-methods
         """Maps factory to the RecommendationModel data model"""
+
         model = RecommendationModel
 
     id = factory.Sequence(lambda n: n)  # Sequentially increasing ID
