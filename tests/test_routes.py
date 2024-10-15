@@ -91,8 +91,12 @@ class TestRecommendationService(TestCase):
         # Check the data is correct
         new_recommendation = response.get_json()
         self.assertEqual(new_recommendation["user_id"], test_recommendation.user_id)
-        self.assertEqual(new_recommendation["product_id"], test_recommendation.product_id)
-        self.assertAlmostEqual(new_recommendation["score"], test_recommendation.score, places=2)
+        self.assertEqual(
+            new_recommendation["product_id"], test_recommendation.product_id
+        )
+        self.assertAlmostEqual(
+            new_recommendation["score"], test_recommendation.score, places=2
+        )
 
         # Check that the location header was correct
         response = self.client.get(location)
@@ -101,7 +105,6 @@ class TestRecommendationService(TestCase):
         self.assertEqual(new_recommendation["user_id"], test_recommendation.user_id)
         self.assertEqual(new_recommendation["product_id"], test_recommendation.product_id)
         self.assertAlmostEqual(new_recommendation["score"], test_recommendation.score, places=2)
-    
 
 
     # ----------------------------------------------------------
@@ -183,3 +186,33 @@ class TestRecommendationService(TestCase):
         # Verify that the recommendation has been deleted
         response = self.client.get(f"{BASE_URL}/{recommendation_id}")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    ############################################################
+    # Utility function to bulk Recommendations
+    ############################################################
+    def _create_recommendations(self, count: int = 1) -> list:
+        """Factory method to create pets in bulk"""
+        recommendation_list = []
+        for _ in range(count):
+            test_recommendation = RecommendationFactory()
+            response = self.client.post(BASE_URL, json=test_recommendation.serialize())
+            self.assertEqual(
+                response.status_code,
+                status.HTTP_201_CREATED,
+                "Could not create recommendation",
+            )
+            new_recommendation = response.get_json()
+            test_recommendation.id = new_recommendation["id"]
+            recommendation_list.append(test_recommendation)
+        return recommendation_list
+
+    # ----------------------------------------------------------
+    # TEST LIST
+    # ----------------------------------------------------------
+    def test_get_recommendations_list(self):
+        """It should Get a list of recommendations"""
+        self._create_recommendations(5)
+        response = self.client.get(BASE_URL)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.get_json()
+        self.assertEqual(len(data), 5)
