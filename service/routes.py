@@ -34,7 +34,20 @@ from service.common import status  # HTTP Status Codes
 def index():
     """Root URL response"""
     return (
-        "Reminder: return some useful information in json format about the service here",
+        jsonify(
+            {
+                "service": "Recommendation Service",
+                "version": "1.0.0",
+                "description": "This service implements a REST API for creating, reading, updating, and deleting recommendations.",
+                "status": "Running",
+                "endpoints": {
+                    "create": "/recommendations (POST)",
+                    "retrieve": "/recommendations/<id> (GET)",
+                    "update": "/recommendations/<id> (PUT)",
+                    "delete": "/recommendations/<id> (DELETE)",
+                },
+            }
+        ),
         status.HTTP_200_OK,
     )
 
