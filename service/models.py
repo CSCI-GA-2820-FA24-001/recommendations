@@ -27,16 +27,10 @@ class RecommendationModel(db.Model):
     # Table Schema
     ##################################################
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(
-        db.Integer, nullable=False
-    )  # ID of the user receiving the recommendation
-    product_id = db.Column(db.Integer, nullable=False)  # ID of the recommended product
-    score = db.Column(
-        db.Float, nullable=False
-    )  # Score representing recommendation confidence
-    timestamp = db.Column(
-        db.DateTime, nullable=False
-    )  # Timestamp when the recommendation was made
+    user_id = db.Column(db.Integer, nullable=False)
+    product_id = db.Column(db.Integer, nullable=False)
+    score = db.Column(db.Float, nullable=False)
+    timestamp = db.Column(db.DateTime, nullable=False)
 
     def __repr__(self):
         return f"<Recommendation user_id={self.user_id}, product_id={self.product_id}, score={self.score}>"
