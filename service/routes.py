@@ -192,9 +192,11 @@ def list_recommendations():
     product_id = request.args.get("product_id")
 
     if user_id:
+        user_id = int(user_id)
         app.logger.info("Find by user_id: %s", user_id)
         recommendations = RecommendationModel.find_by_user(user_id)
     elif product_id:
+        product_id = int(product_id)
         app.logger.info("Find by product_id: %s", product_id)
         recommendations = RecommendationModel.find_by_product(product_id)
     else:

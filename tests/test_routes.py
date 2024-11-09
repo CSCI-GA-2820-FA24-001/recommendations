@@ -288,3 +288,52 @@ class TestRecommendationService(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         data = response.get_json()
         self.assertEqual(len(data), 5)
+
+    def test_query_by_product_id(self):
+        """It should Query Recommendations by a source product id"""
+        recommendations = self._create_recommendations(5)
+        test_id = int(recommendations[0].product_id)
+        name_count = len([rec for rec in recommendations if rec.product_id == test_id])
+        response = self.client.get(BASE_URL, query_string=f"product_id={test_id}")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.get_json()
+        self.assertEqual(len(data), name_count)
+        for rec in data:
+            self.assertEqual(rec["product_id"], test_id)
+
+    def test_query_by_user_id(self):
+        """It should Query Recommendations by a source user id"""
+        recommendations = self._create_recommendations(5)
+        test_id = int(recommendations[0].user_id)
+        name_count = len([rec for rec in recommendations if rec.user_id == test_id])
+        response = self.client.get(BASE_URL, query_string=f"user_id={test_id}")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.get_json()
+        self.assertEqual(len(data), name_count)
+        for rec in data:
+            self.assertEqual(rec["user_id"], test_id)
+
+    def test_query_by_user_and_product_id(self):
+        """It should query recommendations by both user_id and product_id"""
+        recommendations = self._create_recommendations(10)
+        test_user_id = int(recommendations[0].user_id)
+        test_product_id = int(recommendations[0].product_id)
+
+        expected_recommendations = [
+            rec
+            for rec in recommendations
+            if rec.user_id == test_user_id and rec.product_id == test_product_id
+        ]
+        expected_count = len(expected_recommendations)
+
+        response = self.client.get(
+            BASE_URL,
+            query_string=f"user_id={test_user_id}&product_id={test_product_id}",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.get_json()
+        self.assertEqual(len(data), expected_count)
+
+        for rec in data:
+            self.assertEqual(rec["user_id"], test_user_id)
+            self.assertEqual(rec["product_id"], test_product_id)
