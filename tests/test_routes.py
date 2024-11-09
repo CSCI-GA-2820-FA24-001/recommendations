@@ -258,3 +258,33 @@ class TestRecommendationService(TestCase):
         self.assertIn(
             "Content-Type must be application/json", response.get_json()["message"]
         )
+
+    ############################################################
+    # Utility function to bulk Recommendations
+    ############################################################
+    def _create_recommendations(self, count: int = 1) -> list:
+        """Factory method to create pets in bulk"""
+        recommendation_list = []
+        for _ in range(count):
+            test_recommendation = RecommendationFactory()
+            response = self.client.post(BASE_URL, json=test_recommendation.serialize())
+            self.assertEqual(
+                response.status_code,
+                status.HTTP_201_CREATED,
+                "Could not create recommendation",
+            )
+            new_recommendation = response.get_json()
+            test_recommendation.id = new_recommendation["id"]
+            recommendation_list.append(test_recommendation)
+        return recommendation_list
+
+    # ----------------------------------------------------------
+    # TEST LIST
+    # ----------------------------------------------------------
+    def test_get_recommendations_list(self):
+        """It should Get a list of recommendations"""
+        self._create_recommendations(5)
+        response = self.client.get(BASE_URL)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.get_json()
+        self.assertEqual(len(data), 5)
