@@ -175,6 +175,39 @@ def delete_recommendation(id):
 
 
 ######################################################################
+# LIST ALL RECOMMENDATIONS
+######################################################################
+@app.route("/recommendations", methods=["GET"])
+def list_recommendations():
+    """
+    List all Recommendations
+    This endpoint will return all Recommendations or filter them by query parameters
+    """
+    app.logger.info("Request for recommendation list")
+
+    recommendations = []
+
+    # Parse query parameters
+    user_id = request.args.get("user_id")
+    product_id = request.args.get("product_id")
+
+    if user_id:
+        app.logger.info("Find by user_id: %s", user_id)
+        recommendations = RecommendationModel.find_by_user(user_id)
+    elif product_id:
+        app.logger.info("Find by product_id: %s", product_id)
+        recommendations = RecommendationModel.find_by_product(product_id)
+    else:
+        app.logger.info("Find all")
+        recommendations = RecommendationModel.all()
+
+    # Serialize the results
+    results = [recommendation.serialize() for recommendation in recommendations]
+    app.logger.info("Returning %d recommendations", len(results))
+    return jsonify(results), status.HTTP_200_OK
+
+
+######################################################################
 #  U T I L I T Y   F U N C T I O N S
 ######################################################################
 
