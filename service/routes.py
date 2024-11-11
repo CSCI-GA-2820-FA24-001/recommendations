@@ -93,7 +93,7 @@ def create_recommendation():
 ######################################################################
 # RETRIEVE A RECOMMENDATION BY ID
 ######################################################################
-@app.route("/recommendations/<recommendation_id>", methods=["GET"])
+@app.route("/recommendations/<int:recommendation_id>", methods=["GET"])
 def get_recommendation(recommendation_id):
     """
     Retrieve a Recommendation
@@ -146,7 +146,7 @@ def update_recommendation(recommendation_id):
 ######################################################################
 # DELETE A RECOMMENDATION
 ######################################################################
-@app.route("/recommendations/<id>", methods=["DELETE"])
+@app.route("/recommendations/<recommendation_id>", methods=["DELETE"])
 def delete_recommendation(recommendation_id):
     """
     Delete a Recommendation
