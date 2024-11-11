@@ -93,7 +93,7 @@ def create_recommendation():
 ######################################################################
 # RETRIEVE A RECOMMENDATION BY ID
 ######################################################################
-@app.route("/recommendations/<int:recommendation_id>", methods=["GET"])
+@app.route("/recommendations/<recommendation_id>", methods=["GET"])
 def get_recommendation(recommendation_id):
     """
     Retrieve a Recommendation
