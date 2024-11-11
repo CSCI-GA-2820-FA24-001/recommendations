@@ -38,7 +38,7 @@ def index():
             {
                 "service": "Recommendation Service",
                 "version": "1.0.0",
-                "description": "This service implements a REST API for creating, reading, updating, and deleting recommendations.",
+                "description": "This service implements a REST API for CRUD recommendations.",
                 "status": "Running",
                 "endpoints": {
                     "create": "/recommendations (POST)",
