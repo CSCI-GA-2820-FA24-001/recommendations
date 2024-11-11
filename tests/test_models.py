@@ -23,6 +23,7 @@ import os
 import logging
 from unittest import TestCase
 from unittest.mock import patch
+from datetime import datetime
 from wsgi import app
 from service.models import RecommendationModel, DataValidationError, db
 
@@ -68,7 +69,6 @@ class TestRecommendationModel(TestCase):
 
     def test_create_a_recommendation(self):
         """It should Create a recommendation and assert that it exists"""
-        from datetime import datetime
 
         recommendation = RecommendationModel(
             user_id=123, product_id=456, score=4.5, timestamp=datetime.utcnow()
@@ -82,7 +82,6 @@ class TestRecommendationModel(TestCase):
 
     def test_serialize_a_recommendation(self):
         """It should serialize a recommendation into a dictionary"""
-        from datetime import datetime
 
         recommendation = RecommendationModel(
             user_id=123, product_id=456, score=4.5, timestamp=datetime.utcnow()
@@ -99,7 +98,6 @@ class TestRecommendationModel(TestCase):
 
     def test_update_a_recommendation(self):
         """It should update a recommendation in the database"""
-        from datetime import datetime
 
         recommendation = RecommendationModel(
             user_id=123, product_id=456, score=4.5, timestamp=datetime.utcnow()
@@ -119,7 +117,6 @@ class TestRecommendationModel(TestCase):
 
     def test_delete_a_recommendation(self):
         """It should delete a recommendation from the database"""
-        from datetime import datetime
 
         recommendation = RecommendationModel(
             user_id=123, product_id=456, score=4.5, timestamp=datetime.utcnow()

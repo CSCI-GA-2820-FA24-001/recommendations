@@ -147,20 +147,20 @@ def update_recommendation(recommendation_id):
 # DELETE A RECOMMENDATION
 ######################################################################
 @app.route("/recommendations/<id>", methods=["DELETE"])
-def delete_recommendation(id):
+def delete_recommendation(recommendation_id):
     """
     Delete a Recommendation
     This endpoint will delete a Recommendation based on its id
     """
-    app.logger.info("Request to Delete a Recommendation with id [%s]", id)
+    app.logger.info("Request to Delete a Recommendation with id [%s]", recommendation_id)
 
-    # Check if the id is a valid integer
-    if not id.isdigit():
-        app.logger.error("Invalid ID format: [%s]", id)
+    # Check if the recommendation_id is a valid integer
+    if not recommendation_id.isdigit():
+        app.logger.error("Invalid ID format: [%s]", recommendation_id)
         return {"error": "Invalid ID format"}, status.HTTP_400_BAD_REQUEST
 
-    # Convert the ID to integer and try to find the recommendation
-    recommendation_id = int(id)
+    # Convert the recommendation_id to integer and try to find the recommendation
+    recommendation_id = int(recommendation_id)
     recommendation = RecommendationModel.find(recommendation_id)
 
     if recommendation is None:
