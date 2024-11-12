@@ -31,6 +31,7 @@ class RecommendationModel(db.Model):
     product_id = db.Column(db.Integer, nullable=False)
     score = db.Column(db.Float, nullable=False)
     timestamp = db.Column(db.DateTime, nullable=False)
+    num_likes = db.Column(db.Integer, nullable=False, default=0)
 
     def __repr__(self):
         return f"<Recommendation user_id={self.user_id}, product_id={self.product_id}, score={self.score}>"
@@ -95,6 +96,7 @@ class RecommendationModel(db.Model):
             "product_id": self.product_id,
             "score": self.score,
             "timestamp": self.timestamp,
+            "num_likes": self.num_likes,
         }
 
     def deserialize(self, data):
@@ -109,6 +111,7 @@ class RecommendationModel(db.Model):
             self.product_id = data["product_id"]
             self.score = data["score"]
             self.timestamp = data["timestamp"]
+            self.num_likes = data.get("num_likes", 0)
         except KeyError as error:
             raise DataValidationError(
                 "Invalid Recommendation: missing " + error.args[0]
