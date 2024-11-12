@@ -337,3 +337,35 @@ class TestRecommendationService(TestCase):
         for rec in data:
             self.assertEqual(rec["user_id"], test_user_id)
             self.assertEqual(rec["product_id"], test_product_id)
+
+    # def test_get_recommendation_likes(self):
+    #     """It should get the number of likes for a recommendation"""
+    #     test_recommendation = RecommendationFactory()
+    #     response = self.client.post(BASE_URL, json=test_recommendation.serialize())
+    #     self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+    #     recommendation_id = response.get_json()["id"]
+
+    #     # Check likes count (should start with 0)
+    #     response = self.client.get(f"{BASE_URL}/{recommendation_id}/likes")
+    #     self.assertEqual(response.status_code, status.HTTP_200_OK)
+    #     data = response.get_json()
+    #     self.assertEqual(data["likes"], 0)
+
+    # def test_increment_recommendation_likes(self):
+    #     """It should increment the likes for a recommendation"""
+    #     test_recommendation = RecommendationFactory()
+    #     response = self.client.post(BASE_URL, json=test_recommendation.serialize())
+    #     self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+    #     recommendation_id = response.get_json()["id"]
+
+    #     # Increment likes
+    #     response = self.client.post(f"{BASE_URL}/{recommendation_id}/likes")
+    #     self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    #     # Check likes count (should be 1 after increment)
+    #     response = self.client.get(f"{BASE_URL}/{recommendation_id}/likes")
+    #     self.assertEqual(response.status_code, status.HTTP_200_OK)
+    #     data = response.get_json()
+    #     self.assertEqual(data["likes"], 1)

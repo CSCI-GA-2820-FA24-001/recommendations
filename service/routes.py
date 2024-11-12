@@ -152,7 +152,9 @@ def delete_recommendation(recommendation_id):
     Delete a Recommendation
     This endpoint will delete a Recommendation based on its id
     """
-    app.logger.info("Request to Delete a Recommendation with id [%s]", recommendation_id)
+    app.logger.info(
+        "Request to Delete a Recommendation with id [%s]", recommendation_id
+    )
 
     # Check if the recommendation_id is a valid integer
     if not recommendation_id.isdigit():
@@ -234,3 +236,59 @@ def check_content_type(content_type) -> None:
         status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
         f"Content-Type must be {content_type}",
     )
+
+
+# ######################################################################
+# # GET NUMBER OF LIKES FOR A RECOMMENDATION
+# ######################################################################
+# @app.route("/recommendations/<int:recommendation_id>/likes", methods=["GET"])
+# def get_recommendation_likes(recommendation_id):
+#     """
+#     Retrieve the number of likes for a Recommendation
+#     This endpoint returns the number of likes for a given recommendation by ID
+#     """
+#     app.logger.info(
+#         "Request to get the number of likes for recommendation id [%s]",
+#         recommendation_id,
+#     )
+
+#     recommendation = RecommendationModel.find(recommendation_id)
+#     if not recommendation:
+#         abort(
+#             status.HTTP_404_NOT_FOUND,
+#             f"Recommendation with id [{recommendation_id}] not found.",
+#         )
+
+#     return (
+#         jsonify({"id": recommendation_id, "likes": recommendation.num_likes}),
+#         status.HTTP_200_OK,
+#     )
+
+
+# ######################################################################
+# # INCREMENT LIKES FOR A RECOMMENDATION
+# ######################################################################
+# @app.route("/recommendations/<int:recommendation_id>/likes", methods=["POST"])
+# def increment_recommendation_likes(recommendation_id):
+#     """
+#     Increment the number of likes for a Recommendation
+#     This endpoint increments the number of likes for a given recommendation by ID
+#     """
+#     app.logger.info(
+#         "Request to increment likes for recommendation id [%s]", recommendation_id
+#     )
+
+#     recommendation = RecommendationModel.find(recommendation_id)
+#     if not recommendation:
+#         abort(
+#             status.HTTP_404_NOT_FOUND,
+#             f"Recommendation with id [{recommendation_id}] not found.",
+#         )
+
+#     # Increment the number of likes
+#     recommendation.num_likes = (
+#         recommendation.num_likes + 1 if recommendation.num_likes else 1
+#     )
+#     recommendation.update()
+
+#     return jsonify(recommendation.serialize()), status.HTTP_200_OK
