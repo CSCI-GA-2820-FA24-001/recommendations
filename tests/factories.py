@@ -21,3 +21,4 @@ class RecommendationFactory(factory.Factory):
     product_id = factory.Sequence(lambda n: n + 1000)  # Simulates unique product IDs
     score = FuzzyFloat(0.5, 5.0, precision=2)  # Random score between 0.5 and 5.0
     timestamp = factory.LazyFunction(datetime.now)  # Current timestamp
+    num_likes = 0

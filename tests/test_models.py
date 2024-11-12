@@ -71,7 +71,11 @@ class TestRecommendationModel(TestCase):
         """It should Create a recommendation and assert that it exists"""
 
         recommendation = RecommendationModel(
-            user_id=123, product_id=456, score=4.5, timestamp=datetime.utcnow()
+            user_id=123,
+            product_id=456,
+            score=4.5,
+            timestamp=datetime.utcnow(),
+            num_likes=0,
         )
 
         self.assertTrue(recommendation is not None)
@@ -84,7 +88,11 @@ class TestRecommendationModel(TestCase):
         """It should serialize a recommendation into a dictionary"""
 
         recommendation = RecommendationModel(
-            user_id=123, product_id=456, score=4.5, timestamp=datetime.utcnow()
+            user_id=123,
+            product_id=456,
+            score=4.5,
+            timestamp=datetime.utcnow(),
+            num_likes=10,
         )
         serial_recommendation = recommendation.serialize()
 
@@ -95,12 +103,17 @@ class TestRecommendationModel(TestCase):
         self.assertEqual(
             serial_recommendation["id"], None
         )  # Since it hasn't been saved to DB yet
+        self.assertEqual(recommendation.num_likes, 10)
 
     def test_update_a_recommendation(self):
         """It should update a recommendation in the database"""
 
         recommendation = RecommendationModel(
-            user_id=123, product_id=456, score=4.5, timestamp=datetime.utcnow()
+            user_id=123,
+            product_id=456,
+            score=4.5,
+            timestamp=datetime.utcnow(),
+            num_likes=0,
         )
         recommendation.create()
 
@@ -119,7 +132,11 @@ class TestRecommendationModel(TestCase):
         """It should delete a recommendation from the database"""
 
         recommendation = RecommendationModel(
-            user_id=123, product_id=456, score=4.5, timestamp=datetime.utcnow()
+            user_id=123,
+            product_id=456,
+            score=4.5,
+            timestamp=datetime.utcnow(),
+            num_likes=0,
         )
         recommendation.create()
 
@@ -138,6 +155,7 @@ class TestRecommendationModel(TestCase):
             "product_id": 456,
             "score": 4.5,
             "timestamp": "2024-10-14T12:00:00Z",
+            "num_likes": 10,
         }
         recommendation = RecommendationModel()
         recommendation.deserialize(data)
@@ -146,6 +164,7 @@ class TestRecommendationModel(TestCase):
         self.assertEqual(recommendation.product_id, 456)
         self.assertEqual(recommendation.score, 4.5)
         self.assertIsNotNone(recommendation.timestamp)
+        self.assertEqual(recommendation.num_likes, 10)
 
     def test_deserialize_missing_data(self):
         """It should raise DataValidationError when deserializing with missing fields"""
