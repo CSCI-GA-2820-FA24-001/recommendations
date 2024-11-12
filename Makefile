@@ -41,6 +41,11 @@ test: ## Run the unit tests
 	$(info Running tests...)
 	pytest --pspec --cov=service --cov-fail-under=95
 
+.PHONY: bdd
+bdd: ## Run the BDD tests
+	$(info Running BDD tests...)
+	behave
+
 ##@ Runtime
 
 .PHONY: run
