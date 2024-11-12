@@ -1,5 +1,6 @@
 # These can be overidden with env vars.
 CLUSTER ?= nyu-devops
+REGISTRY ?= cluster-registry:5000
 
 .SILENT:
 
