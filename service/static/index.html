@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Recommendation Demo RESTful Service</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/x-icon" href="static/images/newapp-icon.png">
+    <link rel="stylesheet" href="static/css/cerulean_bootstrap.min.css">
+</head>
+
+<body>
+    <div class="container">
+        <div class="page-header">
+            <h1>Recommendation Demo RESTful Service</h1>
+        </div>
+
+        <!-- Flash Message -->
+        <div class="table-responsive">
+            <table class="table">
+                <tr>
+                    <td>Status:</td>
+                    <td><span id="flash_message"></span></td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- FORM -->
+        <div class="col-md-12" id="form_data">
+            <h3>Create, Retrieve, Update, and Delete a Recommendation:</h3>
+            <div class="well">
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        <label class="control-label col-sm-2" for="rec_id">Recommendation ID:</label>
+                        <div class="col-sm-6">
+                            <input type="text" class="form-control" id="rec_id"
+                                placeholder="Enter ID of Recommendation">
+                        </div>
+                        <div class="col-sm-4">
+                            <button type="submit" class="btn btn-primary" id="retrieve-btn">Retrieve</button>
+                            <button type="submit" class="btn btn-danger" id="delete-btn">Delete</button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-sm-2" for="rec_product_id">Product ID:</label>
+                        <div class="col-sm-6">
+                            <input type="text" class="form-control" id="rec_product_id"
+                                placeholder="Enter Product ID of Recommendation">
+                        </div>
+                        <div class="col-sm-4">
+                            <button type="submit" class="btn btn-primary" id="retrieve-by-src-item-id-btn">Retrieve by Product</button>
+                        </div>
+                    </div>
+                </div> <!-- form horizontal -->
+
+                <div class="form-horizontal">
+
+                    <!-- USER ID -->
+                    <div class="form-group">
+                        <label class="control-label col-sm-2" for="user_id">User ID:</label>
+                        <div class="col-sm-6">
+                            <input type="text" class="form-control" id="rec_user_id"
+                                placeholder="Enter User ID for Recommendation">
+                        </div>
+                        <div class="col-sm-4">
+                            <button type="submit" class="btn btn-primary" id="retrieve-by-user-id-btn">Retrieve by User</button>
+                        </div>
+                    </div>
+
+                    <!-- LIKES -->
+                    <div class="form-group">
+                        <label class="control-label col-sm-2" for="num_of_likes">Number of Likes:</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="rec_num_of_likes"
+                                placeholder="Enter Number of Likes for Recommendation">
+                        </div>
+                    </div>
+
+                    <!-- SCORE -->
+                    <div class="form-group">
+                        <label class="control-label col-sm-2" for="score">Score:</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="rec_score"
+                                placeholder="Enter Score for Recommendation">
+                        </div>
+                    </div>
+
+                    <!-- SUBMIT BUTTONS -->
+                    <div class="form-group">
+                        <div class="col-sm-offset-2 col-sm-10">
+                            <button type="submit" class="btn btn-primary" id="search-btn">Search</button>
+                            <button type="submit" class="btn btn-primary" id="clear-btn">Clear</button>
+                            <button type="submit" class="btn btn-success" id="create-btn">Create</button>
+                            <button type="submit" class="btn btn-warning" id="update-btn">Update</button>
+                        </div>
+                    </div>
+                </div> <!-- form horizontal -->
+            </div> <!-- end well -->
+        </div> <!-- end Form -->
+
+        <!-- Search Results -->
+        <div class="table-responsive col-md-12" id="search_results">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <!--
+                            style="border-right: 1px dashed #000;"
+                        -->
+                        <th class="col-md-1">ID</th>
+                        <th class="col-md-1">User ID</th>
+                        <th class="col-md-1">Product ID</th>
+                        <th class="col-md-1">Score</th>
+                        <th class="col-md-2">Created Time</th>
+                        <th class="col-md-2">Number of Likes</th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+
+        <!-- Pagination Controls -->
+        <div class="col-md-12" style="text-align: center;">
+            <div class="table-responsive">
+                <table class="table">
+                    <tr>
+                        <td><span id="search_summary"></span></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <footer>
+            <br><br>
+            <p>&copy; NYU DevOps Company 2023</p>
+        </footer>
+
+    </div> <!-- container -->
+
+    <script type="text/javascript" src="static/js/jquery-3.6.0.min.js"></script>
+    <script type="text/javascript" src="static/js/bootstrap.min.js"></script>
+
+    <!-- YOUR REST API -->
+    <script type="text/javascript" src="static/js/rest_api.js"></script>
+    <script type="text/javascript" src="static/js/form_validation.js"></script>
+
+</body>
+
+</html>
