@@ -32,24 +32,8 @@ from service.common import status  # HTTP Status Codes
 ######################################################################
 @app.route("/")
 def index():
-    """Root URL response"""
-    return (
-        jsonify(
-            {
-                "service": "Recommendation Service",
-                "version": "1.0.0",
-                "description": "This service implements a REST API for CRUD recommendations.",
-                "status": "Running",
-                "endpoints": {
-                    "create": "/recommendations (POST)",
-                    "retrieve": "/recommendations/<id> (GET)",
-                    "update": "/recommendations/<id> (PUT)",
-                    "delete": "/recommendations/<id> (DELETE)",
-                },
-            }
-        ),
-        status.HTTP_200_OK,
-    )
+    """Base URL for our service"""
+    return app.send_static_file("index.html")
 
 
 ######################################################################
