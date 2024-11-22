@@ -70,3 +70,9 @@ output="./coverage.xml"
 [tool.coverage.html]
 title = "Test Coverage Report"
 directory = "coverage_html_report"
+
+# Behavior-Driven Development
+behave = "^1.2.6"
+selenium = "4.16.0" # newer versions do not work
+requests = "^2.31.0"
+compare3 = "^1.0.4"

@@ -1,4 +1,4 @@
-FROM rofrano/nyu-devops-base:fa24
+FROM rofrano/pipeline-selenium:latest
 
 WORKDIR /app
 COPY pyproject.toml poetry.lock ./
