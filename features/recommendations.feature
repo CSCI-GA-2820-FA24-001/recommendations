@@ -34,3 +34,27 @@ Scenario: Create a Recommendation
     And I should see "101" in the "product_id" field
     And I should see "0.82" in the "score" field
     And I should see "5" in the "num_likes" field
+
+Scenario: Update a Recommendation
+    When I visit the "Home Page"
+    And I set the "user_id" to "2"
+    And I set the "product_id" to "101"
+    And I set the "score" to "0.88"
+    And I set the "num_likes" to "10"
+    And I press the "Create" button
+    Then I should see the message "Success"
+    When I copy the "id" field
+    And I press the "Clear" button
+    And I paste the "id" field
+    And I press the "Retrieve" button
+    Then I should see the message "Success"
+    When I set the "score" to "0.95"
+    And I set the "num_likes" to "12"
+    And I press the "Update" button
+    Then I should see the message "Success"
+    When I press the "Clear" button
+    And I paste the "id" field
+    And I press the "Retrieve" button
+    Then I should see the message "Success"
+    And I should see "0.95" in the "score" field
+    And I should see "12" in the "num_likes" field
