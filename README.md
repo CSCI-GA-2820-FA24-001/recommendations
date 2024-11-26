@@ -65,3 +65,26 @@ Copyright (c) 2016, 2024 [John Rofrano](https://www.linkedin.com/in/JohnRofrano/
 Licensed under the Apache License. See [LICENSE](LICENSE)
 
 This repository is part of the New York University (NYU) masters class: **CSCI-GA.2820-001 DevOps and Agile Methodologies** created and taught by [John Rofrano](https://cs.nyu.edu/~rofrano/), Adjunct Instructor, NYU Courant Institute, Graduate Division, Computer Science, and NYU Stern School of Business.
+
+### List/Query Recommendations
+
+- **Endpoint**: `/recommendations`
+- **Method**: `GET`
+- **Query Parameters**:
+  - user_id (int): Filter by user ID
+  - product_id (int): Filter by product ID
+  - min_score (float): Filter by minimum score
+  - max_score (float): Filter by maximum score
+  - min_likes (int): Filter by minimum number of likes
+  - max_likes (int): Filter by maximum number of likes
+  - from_date (str): Filter by recommendations after this date (YYYY-MM-DD)
+  - to_date (str): Filter by recommendations before this date (YYYY-MM-DD)
+
+### Like a Recommendation (Action)
+
+- **Endpoint**: `/recommendations/{id}/likes`
+- **Method**: `POST`
+- **Description**: Increments the number of likes for a recommendation
+- **Response**:
+  - 200 OK: Returns the updated recommendation
+  - 404 Not Found: If recommendation doesn't exist

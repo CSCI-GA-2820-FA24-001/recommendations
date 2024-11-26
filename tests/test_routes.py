@@ -26,6 +26,7 @@ from wsgi import app
 from service.common import status
 from service.models import db, RecommendationModel
 from .factories import RecommendationFactory
+from datetime import datetime
 
 DATABASE_URI = os.getenv(
     "DATABASE_URI", "postgresql+psycopg://postgres:postgres@localhost:5432/testdb"
@@ -370,6 +371,75 @@ class TestRecommendationService(TestCase):
         data = response.get_json()
         self.assertEqual(data["likes"], 1)
 
+    def test_like_recommendation(self):
+        """It should increment the likes for a recommendation"""
+        test_recommendation = RecommendationFactory()
+        response = self.client.post(BASE_URL, json=test_recommendation.serialize())
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        new_recommendation = response.get_json()
+        recommendation_id = new_recommendation["id"]
+
+        # Get initial likes count
+        response = self.client.get(f"{BASE_URL}/{recommendation_id}/likes")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        initial_likes = response.get_json()["likes"]
+
+        # Increment likes
+        response = self.client.post(f"{BASE_URL}/{recommendation_id}/likes")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # Verify likes increased by 1
+        response = self.client.get(f"{BASE_URL}/{recommendation_id}/likes")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.get_json()["likes"], initial_likes + 1)
+
+    def test_like_recommendation_not_found(self):
+        """It should return 404 when trying to like a non-existent recommendation"""
+        response = self.client.post(f"{BASE_URL}/99999/likes")
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_query_recommendations_by_score(self):
+        """It should Query Recommendations by score range"""
+        recommendations = self._create_recommendations(10)
+        test_score = recommendations[0].score
+
+        response = self.client.get(
+            BASE_URL,
+            query_string=f"min_score={test_score-0.1}&max_score={test_score+0.1}",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.get_json()
+
+        # Check that all returned recommendations are within score range
+        for rec in data:
+            self.assertTrue(test_score - 0.1 <= rec["score"] <= test_score + 0.1)
+
+    def test_query_recommendations_by_likes(self):
+        """It should Query Recommendations by number of likes"""
+        recommendations = self._create_recommendations(5)
+        # Like the first recommendation twice
+        rec_id = recommendations[0].id
+        self.client.post(f"{BASE_URL}/{rec_id}/likes")
+        self.client.post(f"{BASE_URL}/{rec_id}/likes")
+
+        response = self.client.get(BASE_URL, query_string="min_likes=2")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.get_json()
+
+        # Should only return recommendations with 2 or more likes
+        self.assertEqual(len(data), 1)
+        self.assertTrue(data[0]["num_likes"] >= 2)
+
+    def test_query_recommendations_by_date(self):
+        """It should Query Recommendations by date range"""
+        self._create_recommendations(5)
+        today = datetime.now().strftime("%Y-%m-%d")
+
+        response = self.client.get(BASE_URL, query_string=f"from_date={today}")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.get_json()
+        self.assertTrue(len(data) > 0)
     def test_health(self):
         """It should get the health endpoint"""
         resp = self.client.get("/health")  # Use self.client instead of app
