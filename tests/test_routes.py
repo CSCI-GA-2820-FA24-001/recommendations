@@ -369,3 +369,31 @@ class TestRecommendationService(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         data = response.get_json()
         self.assertEqual(data["likes"], 1)
+
+    def test_like_recommendation(self):
+        """It should increment the likes for a recommendation"""
+        test_recommendation = RecommendationFactory()
+        response = self.client.post(BASE_URL, json=test_recommendation.serialize())
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        new_recommendation = response.get_json()
+        recommendation_id = new_recommendation["id"]
+
+        # Get initial likes count
+        response = self.client.get(f"{BASE_URL}/{recommendation_id}/likes")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        initial_likes = response.get_json()["likes"]
+
+        # Increment likes
+        response = self.client.post(f"{BASE_URL}/{recommendation_id}/likes")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # Verify likes increased by 1
+        response = self.client.get(f"{BASE_URL}/{recommendation_id}/likes")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.get_json()["likes"], initial_likes + 1)
+
+    def test_like_recommendation_not_found(self):
+        """It should return 404 when trying to like a non-existent recommendation"""
+        response = self.client.post(f"{BASE_URL}/99999/likes")
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
