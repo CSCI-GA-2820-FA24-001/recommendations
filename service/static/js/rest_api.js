@@ -204,4 +204,29 @@ $(function () {
     $("#search-btn").click(function () {
         recQuery()
     });
+
+    // ****************************************
+    // Like a Recommendation
+    // ****************************************
+    $("#like-btn").click(function () {
+        let recommendation_id = $("#recommendation_id").val();
+        
+        $("#flash_message").empty();
+        
+        let ajax = $.ajax({
+            type: "POST",
+            url: `/recommendations/${recommendation_id}/likes`,
+            contentType: "application/json",
+            data: ''
+        });
+
+        ajax.done(function(res){
+            update_form_data(res)
+            flash_message("Success")
+        });
+
+        ajax.fail(function(res){
+            flash_message(res.responseJSON.message)
+        });
+    });
 })
