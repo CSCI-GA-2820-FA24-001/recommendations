@@ -24,37 +24,36 @@ $(function () {
     // ****************************************
 
     $("#create-btn").click(function () {
-        var recId = $('#rec_id').val();
-        var productId = $('#rec_product_id').val();
-        var userId = $('#rec_user_id').val();
-        var numOfLikes = $('#rec_num_of_likes').val();
-        var score = $('#rec_score').val();
-        var timestamp = new Date().toISOString(); // Auto-generate the current timestamp
+        var userId = $("#rec_user_id").val();
+        var productId = $("#rec_product_id").val();
+        var score = $("#rec_score").val();
+        var numLikes = $("#rec_num_likes").val();
+        var timestamp = new Date().toISOString(); // Auto-generate timestamp
+    
         let data = {
-            "id": recId,
-            "product_id": productId,
             "user_id": userId,
+            "product_id": productId,
             "score": score,
-            "num_likes": numOfLikes,
-            "timestamp": timestamp
+            "num_likes": numLikes,
+            "timestamp": timestamp,
         };
-
+    
         $("#flash_message").empty();
-
+    
         let ajax = $.ajax({
             type: "POST",
             url: "/recommendations",
             contentType: "application/json",
             data: JSON.stringify(data),
         });
-
+    
         ajax.done(function (res) {
-            update_form_data(res)
-            flash_message("Success")
+            // Display the new recommendation's ID if needed
+            flash_message(`Success! New Recommendation ID: ${res.id}`);
         });
-
+    
         ajax.fail(function (res) {
-            flash_message(res.responseJSON.message)
+            flash_message(res.responseJSON.message || "Error creating recommendation");
         });
     });
 
