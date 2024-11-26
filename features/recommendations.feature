@@ -25,3 +25,13 @@ Scenario: Create a Recommendation
     And I set the "num_likes" to "5"
     And I press the "Create" button
     Then I should see the message "Success"
+    And the "id" field should not be empty
+    When I copy the "id" field
+    And I press the "Clear" button
+    And I paste the "id" field
+    And I press the "Retrieve" button
+    Then I should see the message "Success"
+    And I should see "1" in the "user_id" field
+    And I should see "101" in the "product_id" field
+    And I should see "0.82" in the "score" field
+    And I should see "5" in the "num_likes" field
