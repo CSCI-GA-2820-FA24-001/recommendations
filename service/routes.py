@@ -208,32 +208,30 @@ def find_recommendations_by_filters():
     app.logger.info("Request to filter Recommendations")
 
     # Extract query parameters
-    user_id = request.args.get("user_id", type=int)
-    product_id = request.args.get("product_id", type=int)
-    score = request.args.get("score", type=float)
-    min_score = request.args.get("min_score", type=float)
-    max_score = request.args.get("max_score", type=float)
-    min_likes = request.args.get("min_likes", type=int)
+    filters = {
+        "user_id": request.args.get("user_id", type=int),
+        "product_id": request.args.get("product_id", type=int),
+        "score": request.args.get("score", type=float),
+        "min_score": request.args.get("min_score", type=float),
+        "max_score": request.args.get("max_score", type=float),
+        "min_likes": request.args.get("min_likes", type=int),
+    }
+
+    # Remove None values to avoid filtering with empty parameters
+    filters = {key: value for key, value in filters.items() if value is not None}
 
     # Validate query parameters
     errors = []
-    if min_score is not None and min_score < 0:
+    if filters.get("min_score", 0) < 0:
         errors.append("min_score must be non-negative.")
-    if max_score is not None and max_score < 0:
+    if filters.get("max_score", 0) < 0:
         errors.append("max_score must be non-negative.")
     if errors:
         app.logger.error("Invalid query parameters: %s", errors)
         return {"errors": errors}, status.HTTP_400_BAD_REQUEST
 
     # Call the `find_by_filters` method in the model
-    recommendations = RecommendationModel.find_by_filters(
-        user_id=user_id,
-        product_id=product_id,
-        score=score,
-        min_score=min_score,
-        max_score=max_score,
-        min_likes=min_likes,
-    )
+    recommendations = RecommendationModel.find_by_filters(filters)
 
     # Serialize the results
     results = [recommendation.serialize() for recommendation in recommendations]

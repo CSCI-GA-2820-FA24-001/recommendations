@@ -382,7 +382,8 @@ class TestRecommendationFilter(TestCase):
         recommendation3.create()
 
         # Find by user_id
-        recommendations = RecommendationModel.find_by_filters(user_id=123)
+        filters = {"user_id": 123}
+        recommendations = RecommendationModel.find_by_filters(filters)
         self.assertEqual(len(recommendations), 2)
         for rec in recommendations:
             self.assertEqual(rec.user_id, 123)
@@ -403,7 +404,8 @@ class TestRecommendationFilter(TestCase):
         recommendation3.create()
 
         # Find by product_id
-        recommendations = RecommendationModel.find_by_filters(product_id=456)
+        filters = {"product_id": 456}
+        recommendations = RecommendationModel.find_by_filters(filters)
         self.assertEqual(len(recommendations), 2)
         for rec in recommendations:
             self.assertEqual(rec.product_id, 456)
@@ -424,7 +426,8 @@ class TestRecommendationFilter(TestCase):
         recommendation3.create()
 
         # Find by score
-        recommendations = RecommendationModel.find_by_filters(score=4.5)
+        filters = {"score": 4.5}
+        recommendations = RecommendationModel.find_by_filters(filters)
         self.assertEqual(len(recommendations), 2)
         for rec in recommendations:
             self.assertEqual(rec.score, 4.5)
@@ -445,9 +448,8 @@ class TestRecommendationFilter(TestCase):
         recommendation3.create()
 
         # Find by user_id and product_id
-        recommendations = RecommendationModel.find_by_filters(
-            user_id=123, product_id=456
-        )
+        filters = {"user_id": 123, "product_id": 456}
+        recommendations = RecommendationModel.find_by_filters(filters)
         self.assertEqual(len(recommendations), 1)
         self.assertEqual(recommendations[0].user_id, 123)
         self.assertEqual(recommendations[0].product_id, 456)
