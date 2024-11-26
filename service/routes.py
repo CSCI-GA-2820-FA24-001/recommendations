@@ -25,6 +25,7 @@ from flask import jsonify, request, url_for, abort
 from flask import current_app as app  # Import Flask application
 from service.models import RecommendationModel
 from service.common import status  # HTTP Status Codes
+from datetime import datetime
 
 
 ######################################################################
@@ -168,28 +169,57 @@ def list_recommendations():
     """
     List all Recommendations
     This endpoint will return all Recommendations or filter them by query parameters
+
+    Query Parameters:
+      - user_id (int): Filter by user ID
+      - product_id (int): Filter by product ID
+      - min_score (float): Filter by minimum score
+      - max_score (float): Filter by maximum score
+      - min_likes (int): Filter by minimum number of likes
+      - max_likes (int): Filter by maximum number of likes
+      - from_date (str): Filter by recommendations after this date (YYYY-MM-DD)
+      - to_date (str): Filter by recommendations before this date (YYYY-MM-DD)
     """
     app.logger.info("Request for recommendation list")
-
-    recommendations = []
 
     # Parse query parameters
     user_id = request.args.get("user_id")
     product_id = request.args.get("product_id")
+    min_score = request.args.get("min_score")
+    max_score = request.args.get("max_score")
+    min_likes = request.args.get("min_likes")
+    max_likes = request.args.get("max_likes")
+    from_date = request.args.get("from_date")
+    to_date = request.args.get("to_date")
 
+    # Start with base query
+    query = RecommendationModel.query
+
+    # Apply filters
     if user_id:
-        user_id = int(user_id)
-        app.logger.info("Find by user_id: %s", user_id)
-        recommendations = RecommendationModel.find_by_user(user_id)
-    elif product_id:
-        product_id = int(product_id)
-        app.logger.info("Find by product_id: %s", product_id)
-        recommendations = RecommendationModel.find_by_product(product_id)
-    else:
-        app.logger.info("Find all")
-        recommendations = RecommendationModel.all()
+        query = query.filter(RecommendationModel.user_id == int(user_id))
+    if product_id:
+        query = query.filter(RecommendationModel.product_id == int(product_id))
+    if min_score:
+        query = query.filter(RecommendationModel.score >= float(min_score))
+    if max_score:
+        query = query.filter(RecommendationModel.score <= float(max_score))
+    if min_likes:
+        query = query.filter(RecommendationModel.num_likes >= int(min_likes))
+    if max_likes:
+        query = query.filter(RecommendationModel.num_likes <= int(max_likes))
+    if from_date:
+        query = query.filter(
+            RecommendationModel.timestamp >= datetime.strptime(from_date, "%Y-%m-%d")
+        )
+    if to_date:
+        query = query.filter(
+            RecommendationModel.timestamp <= datetime.strptime(to_date, "%Y-%m-%d")
+        )
 
-    # Serialize the results
+    # Execute query
+    recommendations = query.all()
+
     results = [recommendation.serialize() for recommendation in recommendations]
     app.logger.info("Returning %d recommendations", len(results))
     return jsonify(results), status.HTTP_200_OK
