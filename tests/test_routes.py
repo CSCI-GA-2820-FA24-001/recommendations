@@ -376,3 +376,126 @@ class TestRecommendationService(TestCase):
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         data = resp.get_json()
         self.assertEqual(data["status"], "OK")
+
+    def test_find_recommendations_by_filters(self):
+        """It should filter recommendations based on query parameters"""
+        recommendations = self._create_recommendations(10)
+
+        # Use one of the created recommendations to test filters
+        test_user_id = recommendations[0].user_id
+        test_product_id = recommendations[0].product_id
+        test_min_score = recommendations[0].score - 0.1
+        test_max_score = recommendations[0].score + 0.1
+        test_min_likes = recommendations[0].num_likes
+
+        # Make a request with all filters
+        response = self.client.get(
+            f"{BASE_URL}/filter",
+            query_string={
+                "user_id": test_user_id,
+                "product_id": test_product_id,
+                "min_score": test_min_score,
+                "max_score": test_max_score,
+                "min_likes": test_min_likes,
+            },
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # Verify the results match the filters
+        data = response.get_json()
+        self.assertGreater(len(data), 0)
+        for rec in data:
+            self.assertEqual(rec["user_id"], test_user_id)
+            self.assertEqual(rec["product_id"], test_product_id)
+            self.assertGreaterEqual(rec["score"], test_min_score)
+            self.assertLessEqual(rec["score"], test_max_score)
+            self.assertGreaterEqual(rec["num_likes"], test_min_likes)
+
+    def test_find_recommendations_by_user_id_filter(self):
+        """It should filter recommendations by user_id only"""
+        recommendations = self._create_recommendations(5)
+        test_user_id = recommendations[0].user_id
+
+        response = self.client.get(
+            f"{BASE_URL}/filter", query_string={"user_id": test_user_id}
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # Validate the filtered results
+        data = response.get_json()
+        self.assertGreater(len(data), 0)
+        for rec in data:
+            self.assertEqual(rec["user_id"], test_user_id)
+
+    def test_find_recommendations_no_filters(self):
+        """It should return all recommendations when no filters are provided"""
+        recommendations = self._create_recommendations(5)
+
+        response = self.client.get(f"{BASE_URL}/filter")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # Ensure all recommendations are returned
+        data = response.get_json()
+        self.assertEqual(len(data), len(recommendations))
+
+    def test_find_recommendations_invalid_query(self):
+        """It should return an empty list for invalid filters"""
+        # Create some recommendations
+        self._create_recommendations(5)
+
+        # Use filters that won't match any recommendation
+        response = self.client.get(
+            f"{BASE_URL}/filter",
+            query_string={"user_id": 9999, "min_score": 100.0, "max_score": 200.0},
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # Ensure no recommendations are returned
+        data = response.get_json()
+        self.assertEqual(len(data), 0)
+
+    def test_find_recommendations_with_invalid_parameters(self):
+        """It should return 400 Bad Request for invalid query parameters"""
+        response = self.client.get(
+            f"{BASE_URL}/filter",
+            query_string={"min_score": -5},  # Invalid: min_score should not be negative
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        errors = response.get_json().get("errors", [])
+        self.assertIn("min_score must be non-negative.", errors)
+
+    def test_find_recommendations_score_range(self):
+        """It should filter recommendations within a score range"""
+        recommendations = self._create_recommendations(10)
+        min_score = recommendations[0].score - 0.5
+        max_score = recommendations[0].score + 0.5
+
+        response = self.client.get(
+            f"{BASE_URL}/filter",
+            query_string={"min_score": min_score, "max_score": max_score},
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # Verify all results are within the score range
+        data = response.get_json()
+        for rec in data:
+            self.assertGreaterEqual(rec["score"], min_score)
+            self.assertLessEqual(rec["score"], max_score)
+
+    def test_find_recommendations_min_likes(self):
+        """It should filter recommendations with a minimum number of likes"""
+        recommendations = self._create_recommendations(5)
+        min_likes = max(
+            rec.num_likes for rec in recommendations
+        )  # Use the highest `num_likes`
+
+        response = self.client.get(
+            f"{BASE_URL}/filter", query_string={"min_likes": min_likes}
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # Verify all results have `num_likes` >= min_likes
+        data = response.get_json()
+        self.assertGreater(len(data), 0)
+        for rec in data:
+            self.assertGreaterEqual(rec["num_likes"], min_likes)

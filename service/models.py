@@ -150,3 +150,31 @@ class RecommendationModel(db.Model):
         """Returns all Recommendations for a specific product"""
         logger.info("Processing lookup for product_id %s ...", product_id)
         return cls.query.filter(cls.product_id == product_id).all()
+
+    @classmethod
+    def find_by_filters(
+        cls,
+        user_id=None,
+        product_id=None,
+        score=None,
+        min_score=None,
+        max_score=None,
+        min_likes=None,
+    ):
+        """Filters recommendations based on query parameters"""
+        query = cls.query
+
+        if user_id is not None:
+            query = query.filter(cls.user_id == user_id)
+        if product_id is not None:
+            query = query.filter(cls.product_id == product_id)
+        if score is not None:
+            query = query.filter(cls.score == score)  # Filter by exact score
+        if min_score is not None:
+            query = query.filter(cls.score >= min_score)
+        if max_score is not None:
+            query = query.filter(cls.score <= max_score)
+        if min_likes is not None:
+            query = query.filter(cls.num_likes >= min_likes)
+
+        return query.all()

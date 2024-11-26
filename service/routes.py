@@ -196,6 +196,53 @@ def list_recommendations():
 
 
 ######################################################################
+# FIND RECOMMENDATIONS BY FILTERS
+######################################################################
+@app.route("/recommendations/filter", methods=["GET"])
+def find_recommendations_by_filters():
+    """
+    Find Recommendations by Filters
+    This endpoint will return recommendations based on query parameters such as user_id, product_id,
+    score range, and minimum number of likes.
+    """
+    app.logger.info("Request to filter Recommendations")
+
+    # Extract query parameters
+    user_id = request.args.get("user_id", type=int)
+    product_id = request.args.get("product_id", type=int)
+    score = request.args.get("score", type=float)
+    min_score = request.args.get("min_score", type=float)
+    max_score = request.args.get("max_score", type=float)
+    min_likes = request.args.get("min_likes", type=int)
+
+    # Validate query parameters
+    errors = []
+    if min_score is not None and min_score < 0:
+        errors.append("min_score must be non-negative.")
+    if max_score is not None and max_score < 0:
+        errors.append("max_score must be non-negative.")
+    if errors:
+        app.logger.error("Invalid query parameters: %s", errors)
+        return {"errors": errors}, status.HTTP_400_BAD_REQUEST
+
+    # Call the `find_by_filters` method in the model
+    recommendations = RecommendationModel.find_by_filters(
+        user_id=user_id,
+        product_id=product_id,
+        score=score,
+        min_score=min_score,
+        max_score=max_score,
+        min_likes=min_likes,
+    )
+
+    # Serialize the results
+    results = [recommendation.serialize() for recommendation in recommendations]
+    app.logger.info("Returning %d filtered recommendations", len(results))
+
+    return jsonify(results), status.HTTP_200_OK
+
+
+######################################################################
 #  U T I L I T Y   F U N C T I O N S
 ######################################################################
 
