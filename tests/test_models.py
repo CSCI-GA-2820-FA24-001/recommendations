@@ -339,6 +339,33 @@ class TestRecommendationModel(TestCase):
         self.assertEqual(recommendations[0].user_id, 123)
         self.assertEqual(recommendations[1].user_id, 124)
 
+
+class TestRecommendationFilter(TestCase):
+    """Test Cases for RecommendationModel"""
+
+    @classmethod
+    def setUpClass(cls):
+        """This runs once before the entire test suite"""
+        app.config["TESTING"] = True
+        app.config["DEBUG"] = False
+        app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URI
+        app.logger.setLevel(logging.CRITICAL)
+        app.app_context().push()
+
+    @classmethod
+    def tearDownClass(cls):
+        """This runs once after the entire test suite"""
+        db.session.close()
+
+    def setUp(self):
+        """This runs before each test"""
+        db.session.query(RecommendationModel).delete()  # clean up the last tests
+        db.session.commit()
+
+    def tearDown(self):
+        """This runs after each test"""
+        db.session.remove()
+
     def test_find_by_filters_user_id(self):
         """It should return recommendations filtered by user_id"""
         recommendation1 = RecommendationModel(
