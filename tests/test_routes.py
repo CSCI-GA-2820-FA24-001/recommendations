@@ -22,11 +22,12 @@ Test Recommendation API Service Test Suite
 import os
 import logging
 from unittest import TestCase
+from datetime import datetime
 from wsgi import app
 from service.common import status
 from service.models import db, RecommendationModel
 from .factories import RecommendationFactory
-from datetime import datetime
+
 
 DATABASE_URI = os.getenv(
     "DATABASE_URI", "postgresql+psycopg://postgres:postgres@localhost:5432/testdb"
