@@ -29,35 +29,15 @@ spec:
         - containerPort: 8080
           protocol: TCP
         env:
-          - name: REDIS_URI
-            valueFrom:
-              secretKeyRef:
-                name: redis-creds
-                key: database-uri 
           - name: POSTGRES_URI
             valueFrom:
               secretKeyRef:
                 name: postgres-creds
                 key: database-uri
-          - name: POSTGRES_PASSWORD
-            valueFrom:
-              secretKeyRef:
-                name: postgres-creds
-                key: password
-          - name: POSTGRES_USER
-            valueFrom:
-              configMapKeyRef:
-                name: postgres-config
-                key: postgres_user
-          - name: POSTGRES_DB
-            valueFrom:
-                configMapKeyRef:
-                  name: postgres-config
-                  key: postgres_db
         resources:
           limits:
-            cpu: "0.25"
-            memory: "64Mi"
+            cpu: "0.50"
+            memory: "128Mi"
           requests:
-            cpu: "0.10"
-            memory: "32Mi"
+            cpu: "0.20"
+            memory: "64Mi"
