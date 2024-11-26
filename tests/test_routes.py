@@ -510,7 +510,7 @@ class TestRecommendationService(TestCase):
 
     def test_find_recommendations_invalid_query(self):
         """It should return an empty list for invalid filters"""
-        # Create some recommendations
+
         self._create_recommendations(5)
 
         # Use filters that won't match any recommendation
