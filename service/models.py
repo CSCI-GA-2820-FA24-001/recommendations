@@ -151,6 +151,7 @@ class RecommendationModel(db.Model):
         logger.info("Processing lookup for product_id %s ...", product_id)
         return cls.query.filter(cls.product_id == product_id).all()
 
+    # pylint: disable=too-many-arguments
     @classmethod
     def find_by_filters(
         cls,

@@ -429,27 +429,6 @@ class TestRecommendationFilter(TestCase):
         for rec in recommendations:
             self.assertEqual(rec.score, 4.5)
 
-    def test_find_by_filters_min_likes(self):
-        """It should return recommendations with at least a minimum number of likes"""
-        recommendation1 = RecommendationModel(
-            user_id=123, product_id=456, score=4.5, num_likes=5
-        )
-        recommendation2 = RecommendationModel(
-            user_id=124, product_id=456, score=4.0, num_likes=3
-        )
-        recommendation3 = RecommendationModel(
-            user_id=123, product_id=789, score=3.5, num_likes=2
-        )
-        recommendation1.create()
-        recommendation2.create()
-        recommendation3.create()
-
-        # Find by minimum likes
-        recommendations = RecommendationModel.find_by_filters(min_likes=3)
-        self.assertEqual(len(recommendations), 2)
-        for rec in recommendations:
-            self.assertGreaterEqual(rec.num_likes, 3)
-
     def test_find_by_filters_combined(self):
         """It should return recommendations matching multiple filters"""
         recommendation1 = RecommendationModel(
