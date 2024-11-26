@@ -6,16 +6,15 @@ Feature: The recommendation service back-end
 Background:
     Given the following recommendations
         | user_id | product_id | score | timestamp           | num_likes |
-        | 1      | 101        | 0.85  | 2024-03-15 10:00:00 | 5         |
-        | 1      | 102        | 0.75  | 2024-03-15 11:00:00 | 3         |
-        | 2      | 101        | 0.90  | 2024-03-15 12:00:00 | 8         |
-        | 3      | 103        | 0.95  | 2024-03-15 13:00:00 | 2         |
+        | 1       | 101        | 0.85  | 2024-03-15 10:00:00 | 5         |
+        | 1       | 102        | 0.75  | 2024-03-15 11:00:00 | 3         |
+        | 2       | 101        | 0.90  | 2024-03-15 12:00:00 | 8         |
+        | 3       | 103        | 0.95  | 2024-03-15 13:00:00 | 2         |
 
 Scenario: The server is running
     When I visit the "Home Page"
     Then I should see "Recommendation Demo RESTful Service" in the title
     And I should not see "404 Not Found"
-
 
 Scenario: Create a Recommendation
     When I visit the "Home Page"

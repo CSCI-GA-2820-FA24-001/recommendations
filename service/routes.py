@@ -21,11 +21,11 @@ This service implements a REST API that allows you to Create, Read, Update
 and Delete Recommendations
 """
 
+from datetime import datetime
 from flask import jsonify, request, url_for, abort
 from flask import current_app as app  # Import Flask application
 from service.models import RecommendationModel
 from service.common import status  # HTTP Status Codes
-from datetime import datetime
 
 
 ######################################################################
@@ -222,6 +222,51 @@ def list_recommendations():
 
     results = [recommendation.serialize() for recommendation in recommendations]
     app.logger.info("Returning %d recommendations", len(results))
+    return jsonify(results), status.HTTP_200_OK
+
+
+######################################################################
+# FIND RECOMMENDATIONS BY FILTERS
+######################################################################
+@app.route("/recommendations/filter", methods=["GET"])
+def find_recommendations_by_filters():
+    """
+    Find Recommendations by Filters
+    This endpoint will return recommendations based on query parameters such as user_id, product_id,
+    score range, and minimum number of likes.
+    """
+    app.logger.info("Request to filter Recommendations")
+
+    # Extract query parameters
+    filters = {
+        "user_id": request.args.get("user_id", type=int),
+        "product_id": request.args.get("product_id", type=int),
+        "score": request.args.get("score", type=float),
+        "min_score": request.args.get("min_score", type=float),
+        "max_score": request.args.get("max_score", type=float),
+        "min_likes": request.args.get("min_likes", type=int),
+    }
+
+    # Remove None values to avoid filtering with empty parameters
+    filters = {key: value for key, value in filters.items() if value is not None}
+
+    # Validate query parameters
+    errors = []
+    if filters.get("min_score", 0) < 0:
+        errors.append("min_score must be non-negative.")
+    if filters.get("max_score", 0) < 0:
+        errors.append("max_score must be non-negative.")
+    if errors:
+        app.logger.error("Invalid query parameters: %s", errors)
+        return {"errors": errors}, status.HTTP_400_BAD_REQUEST
+
+    # Call the `find_by_filters` method in the model
+    recommendations = RecommendationModel.find_by_filters(filters)
+
+    # Serialize the results
+    results = [recommendation.serialize() for recommendation in recommendations]
+    app.logger.info("Returning %d filtered recommendations", len(results))
+
     return jsonify(results), status.HTTP_200_OK
 
 

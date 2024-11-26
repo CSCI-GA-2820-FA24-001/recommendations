@@ -338,3 +338,118 @@ class TestRecommendationModel(TestCase):
         self.assertEqual(len(recommendations), 2)
         self.assertEqual(recommendations[0].user_id, 123)
         self.assertEqual(recommendations[1].user_id, 124)
+
+
+class TestRecommendationFilter(TestCase):
+    """Test Cases for RecommendationModel"""
+
+    @classmethod
+    def setUpClass(cls):
+        """This runs once before the entire test suite"""
+        app.config["TESTING"] = True
+        app.config["DEBUG"] = False
+        app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URI
+        app.logger.setLevel(logging.CRITICAL)
+        app.app_context().push()
+
+    @classmethod
+    def tearDownClass(cls):
+        """This runs once after the entire test suite"""
+        db.session.close()
+
+    def setUp(self):
+        """This runs before each test"""
+        db.session.query(RecommendationModel).delete()  # clean up the last tests
+        db.session.commit()
+
+    def tearDown(self):
+        """This runs after each test"""
+        db.session.remove()
+
+    def test_find_by_filters_user_id(self):
+        """It should return recommendations filtered by user_id"""
+        recommendation1 = RecommendationModel(
+            user_id=123, product_id=456, score=4.5, num_likes=5
+        )
+        recommendation2 = RecommendationModel(
+            user_id=123, product_id=789, score=4.0, num_likes=3
+        )
+        recommendation3 = RecommendationModel(
+            user_id=124, product_id=456, score=3.5, num_likes=2
+        )
+        recommendation1.create()
+        recommendation2.create()
+        recommendation3.create()
+
+        # Find by user_id
+        filters = {"user_id": 123}
+        recommendations = RecommendationModel.find_by_filters(filters)
+        self.assertEqual(len(recommendations), 2)
+        for rec in recommendations:
+            self.assertEqual(rec.user_id, 123)
+
+    def test_find_by_filters_product_id(self):
+        """It should return recommendations filtered by product_id"""
+        recommendation1 = RecommendationModel(
+            user_id=123, product_id=456, score=4.5, num_likes=5
+        )
+        recommendation2 = RecommendationModel(
+            user_id=124, product_id=456, score=4.0, num_likes=3
+        )
+        recommendation3 = RecommendationModel(
+            user_id=123, product_id=789, score=3.5, num_likes=2
+        )
+        recommendation1.create()
+        recommendation2.create()
+        recommendation3.create()
+
+        # Find by product_id
+        filters = {"product_id": 456}
+        recommendations = RecommendationModel.find_by_filters(filters)
+        self.assertEqual(len(recommendations), 2)
+        for rec in recommendations:
+            self.assertEqual(rec.product_id, 456)
+
+    def test_find_by_filters_score(self):
+        """It should return recommendations filtered by score"""
+        recommendation1 = RecommendationModel(
+            user_id=123, product_id=456, score=4.5, num_likes=5
+        )
+        recommendation2 = RecommendationModel(
+            user_id=124, product_id=456, score=4.0, num_likes=3
+        )
+        recommendation3 = RecommendationModel(
+            user_id=123, product_id=789, score=4.5, num_likes=2
+        )
+        recommendation1.create()
+        recommendation2.create()
+        recommendation3.create()
+
+        # Find by score
+        filters = {"score": 4.5}
+        recommendations = RecommendationModel.find_by_filters(filters)
+        self.assertEqual(len(recommendations), 2)
+        for rec in recommendations:
+            self.assertEqual(rec.score, 4.5)
+
+    def test_find_by_filters_combined(self):
+        """It should return recommendations matching multiple filters"""
+        recommendation1 = RecommendationModel(
+            user_id=123, product_id=456, score=4.5, num_likes=5
+        )
+        recommendation2 = RecommendationModel(
+            user_id=124, product_id=456, score=4.0, num_likes=3
+        )
+        recommendation3 = RecommendationModel(
+            user_id=123, product_id=789, score=3.5, num_likes=2
+        )
+        recommendation1.create()
+        recommendation2.create()
+        recommendation3.create()
+
+        # Find by user_id and product_id
+        filters = {"user_id": 123, "product_id": 456}
+        recommendations = RecommendationModel.find_by_filters(filters)
+        self.assertEqual(len(recommendations), 1)
+        self.assertEqual(recommendations[0].user_id, 123)
+        self.assertEqual(recommendations[0].product_id, 456)

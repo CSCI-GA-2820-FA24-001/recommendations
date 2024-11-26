@@ -27,18 +27,16 @@ For information on Waiting until elements are present in the HTML see:
 import logging
 from behave import when, then  # pylint: disable=no-name-in-module
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import Select, WebDriverWait
+from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions
 
-ID_PREFIX = "recommendation_"
+ID_PREFIX = "rec_"
 
 
 @when('I visit the "Home Page"')
 def step_impl(context):
     """Make a call to the base URL"""
     context.driver.get(context.base_url)
-    # Uncomment next line to take a screenshot of the web page
-    # context.driver.save_screenshot('home_page.png')
 
 
 @then('I should see "{message}" in the title')
@@ -47,16 +45,12 @@ def step_impl(context, message):
     assert message in context.driver.title
 
 
-@then('I should not see "{text_string}"')
-def step_impl(context, text_string):
-    element = context.driver.find_element(By.TAG_NAME, "body")
-    assert text_string not in element.text
-
-
 @when('I set the "{field}" to "{value}"')
 def step_impl(context, field, value):
-    element_id = field.lower().replace(" ", "_")
-    element = context.driver.find_element(By.ID, f"rec_{element_id}")
+    element_id = f"{ID_PREFIX}{field.lower().replace(' ', '_')}"
+    element = WebDriverWait(context.driver, context.wait_seconds).until(
+        expected_conditions.presence_of_element_located((By.ID, element_id))
+    )
     element.clear()
     element.send_keys(value)
 
@@ -72,7 +66,13 @@ def step_impl(context, button):
 
 @then('I should see the message "{message}"')
 def step_impl(context, message):
-    flash_message = context.driver.find_element(By.ID, "flash_message").text
+    flash_message = (
+        WebDriverWait(context.driver, context.wait_seconds)
+        .until(
+            expected_conditions.presence_of_element_located((By.ID, "flash_message"))
+        )
+        .text
+    )
     assert (
         message in flash_message
     ), f'Expected message "{message}" but got "{flash_message}"'
@@ -80,15 +80,16 @@ def step_impl(context, message):
 
 @then('the "id" field should not be empty')
 def step_impl(context):
-    element = context.driver.find_element(By.ID, "rec_id")
+    element = WebDriverWait(context.driver, context.wait_seconds).until(
+        expected_conditions.presence_of_element_located((By.ID, f"{ID_PREFIX}id"))
+    )
     field_value = element.get_attribute("value")
     assert field_value, 'The "id" field is empty!'
 
 
 @then('I should see "{expected_value}" in the "{element_name}" field')
 def step_impl(context, expected_value, element_name):
-    element_id = f"rec_{element_name.lower().replace(' ', '_')}"
-    logging.info("Validating field '%s' with ID '%s'", element_name, element_id)
+    element_id = f"{ID_PREFIX}{element_name.lower().replace(' ', '_')}"
     element = WebDriverWait(context.driver, context.wait_seconds).until(
         expected_conditions.presence_of_element_located((By.ID, element_id))
     )
@@ -100,9 +101,7 @@ def step_impl(context, expected_value, element_name):
 
 @when('I copy the "{element_name}" field')
 def step_impl(context, element_name):
-    element_id = (
-        f"rec_{element_name.lower().replace(' ', '_')}"  # Automatically add "rec_"
-    )
+    element_id = f"{ID_PREFIX}{element_name.lower().replace(' ', '_')}"
     element = WebDriverWait(context.driver, context.wait_seconds).until(
         expected_conditions.presence_of_element_located((By.ID, element_id))
     )
@@ -117,16 +116,38 @@ def step_impl(context, element_name):
 
 @when('I paste the "{element_name}" field')
 def step_impl(context, element_name):
-    # Ensure dynamic mapping matches the field in the UI
-    element_id = f"rec_{element_name.lower().replace(' ', '_')}"
-    # Wait for the element to be present and interactable
+    element_id = f"{ID_PREFIX}{element_name.lower().replace(' ', '_')}"
     element = WebDriverWait(context.driver, context.wait_seconds).until(
         expected_conditions.element_to_be_clickable((By.ID, element_id))
     )
-    element.clear()  # Clear existing content
-    element.send_keys(context.clipboard)  # Paste from clipboard
+    element.clear()
+    element.send_keys(context.clipboard)
     logging.info(
         "Pasted value '%s' into the '%s' field",
         context.clipboard,
         element_name,
     )
+
+
+@then('I should see "{name}" in the results')
+def step_impl(context, name):
+    found = WebDriverWait(context.driver, context.wait_seconds).until(
+        expected_conditions.text_to_be_present_in_element(
+            (By.ID, "search_results"), name
+        )
+    )
+    assert found
+
+
+@then('I should not see "{name}" in the results')
+def step_impl(context, name):
+    element = WebDriverWait(context.driver, context.wait_seconds).until(
+        expected_conditions.presence_of_element_located((By.ID, "search_results"))
+    )
+    assert name not in element.text
+
+
+@then('I should not see "404 Not Found"')
+def step_impl(context):
+    body = context.driver.find_element(By.TAG_NAME, "body")
+    assert "404 Not Found" not in body.text, '"404 Not Found" was found on the page!'
