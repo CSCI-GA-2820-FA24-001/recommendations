@@ -53,3 +53,23 @@ def step_impl(context, text_string):
     assert text_string not in element.text
 
 
+@when('I set the "{field}" to "{value}"')
+def step_impl(context, field, value):
+    element_id = field.lower().replace(" ", "_")
+    element = context.driver.find_element(By.ID, f"rec_{element_id}")
+    element.clear()
+    element.send_keys(value)
+
+
+@when('I press the "{button}" button')
+def step_impl(context, button):
+    button_id = button.lower().replace(" ", "_") + "-btn"
+    context.driver.find_element(By.ID, button_id).click()
+
+
+@then('I should see the message "{message}"')
+def step_impl(context, message):
+    flash_message = context.driver.find_element(By.ID, "flash_message").text
+    assert (
+        message in flash_message
+    ), f'Expected message "{message}" but got "{flash_message}"'
