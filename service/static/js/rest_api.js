@@ -19,44 +19,45 @@ $(function () {
         $("#flash_message").append(message);
     }
 
+    let clipboard = "";
     // ****************************************
     // Create a Recommendation
     // ****************************************
 
     $("#create-btn").click(function () {
-        var recId = $('#rec_id').val();
-        var productId = $('#rec_product_id').val();
-        var userId = $('#rec_user_id').val();
-        var numOfLikes = $('#rec_num_of_likes').val();
-        var score = $('#rec_score').val();
-        var timestamp = new Date().toISOString(); // Auto-generate the current timestamp
+        var userId = $("#rec_user_id").val();
+        var productId = $("#rec_product_id").val();
+        var score = $("#rec_score").val();
+        var numLikes = $("#rec_num_likes").val();
+        var timestamp = new Date().toISOString(); // Auto-generate timestamp
+    
         let data = {
-            "id": recId,
-            "product_id": productId,
             "user_id": userId,
+            "product_id": productId,
             "score": score,
-            "num_likes": numOfLikes,
-            "timestamp": timestamp
+            "num_likes": numLikes,
+            "timestamp": timestamp,
         };
-
+    
         $("#flash_message").empty();
-
+    
         let ajax = $.ajax({
             type: "POST",
             url: "/recommendations",
             contentType: "application/json",
             data: JSON.stringify(data),
         });
-
+    
         ajax.done(function (res) {
-            update_form_data(res)
-            flash_message("Success")
+            $("#rec_id").val(res.id);  // Set the ID field in the form
+            flash_message("Success");
         });
-
+    
         ajax.fail(function (res) {
-            flash_message(res.responseJSON.message)
+            flash_message(res.responseJSON.message || "Error creating recommendation");
         });
     });
+    
 
 
     // ****************************************
@@ -96,7 +97,7 @@ $(function () {
         });
 
         ajax.fail(function (res) {
-            flash_message(res.responseJSON.message)
+            flash_message(res.responseJSON.message || "Error updating recommendation.");
         });
 
     });
@@ -113,14 +114,17 @@ $(function () {
 
         let ajax = $.ajax({
             type: "GET",
-            url: `/api/recommendations/${rec_id}`,
+            url: `/recommendations/${rec_id}`,
             contentType: "application/json",
             data: ''
         })
 
         ajax.done(function (res) {
             // console.log(res)
-            update_form_data(res)
+            $("#rec_user_id").val(res.user_id);
+            $("#rec_product_id").val(res.product_id);
+            $("#rec_score").val(res.score);
+            $("#rec_num_likes").val(res.num_likes);
             flash_message("Success")
         });
 
@@ -167,7 +171,6 @@ $(function () {
     // ****************************************
 
     $("#delete-btn").click(function () {
-
         let rec_id = $("#rec_id").val();
 
         $("#flash_message").empty();
@@ -176,16 +179,16 @@ $(function () {
             type: "DELETE",
             url: `/recommendations/${rec_id}`,
             contentType: "application/json",
-            data: '',
-        })
+            data: "",
+        });
 
         ajax.done(function (res) {
-            clear_form_data()
-            flash_message("Recommendation has been deleted!")
+            clear_form_data();
+            flash_message("Recommendation deleted successfully.");
         });
 
         ajax.fail(function (res) {
-            flash_message("Server error!")
+            flash_message(res.responseJSON.message || "Error deleting recommendation.");
         });
     });
 
@@ -195,7 +198,7 @@ $(function () {
 
     $("#clear-btn").click(function () {
         $("#flash_message").empty();
-        clear_form_data()
+        clear_form_data();
     });
 
     $("#search-btn").click(function () {

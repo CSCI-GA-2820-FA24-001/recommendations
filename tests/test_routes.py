@@ -397,3 +397,10 @@ class TestRecommendationService(TestCase):
         """It should return 404 when trying to like a non-existent recommendation"""
         response = self.client.post(f"{BASE_URL}/99999/likes")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_health(self):
+        """It should get the health endpoint"""
+        resp = self.client.get("/health")  # Use self.client instead of app
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        data = resp.get_json()
+        self.assertEqual(data["status"], "OK")
