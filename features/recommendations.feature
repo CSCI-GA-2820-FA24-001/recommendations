@@ -83,3 +83,13 @@ Scenario: Search Recommendations
     And I should see "101" in the results
     And I should see "102" in the results
     And I should not see "103" in the results
+
+Scenario: Query Recommendations by User and Product
+    When I visit the "Home Page"
+    And I set the "user_id" to "1"
+    And I set the "product_id" to "101"
+    And I press the "Search" button
+    Then I should see the message "Success"
+    And I should see "101" in the results
+    And I should not see "102" in the results
+    And I should not see "103" in the results
