@@ -440,6 +440,7 @@ class TestRecommendationService(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         data = response.get_json()
         self.assertTrue(len(data) > 0)
+
     def test_health(self):
         """It should get the health endpoint"""
         resp = self.client.get("/health")  # Use self.client instead of app
