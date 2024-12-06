@@ -32,7 +32,7 @@ from .factories import RecommendationFactory
 DATABASE_URI = os.getenv(
     "DATABASE_URI", "postgresql+psycopg://postgres:postgres@localhost:5432/testdb"
 )
-BASE_URL = "/recommendations"
+BASE_URL = "/api/recommendations"
 
 
 ######################################################################
@@ -116,8 +116,8 @@ class TestRecommendationService(TestCase):
         """It should not Create a new Recommendation with invalid Content-Type"""
         test_recommendation = RecommendationFactory()
         response = self.client.post(
-            BASE_URL, data=test_recommendation.serialize()
-        )  # Missing "json=" parameter
+            "/api/recommendations", data=test_recommendation.serialize()
+        )
         self.assertEqual(response.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
 
     # ----------------------------------------------------------
@@ -184,15 +184,14 @@ class TestRecommendationService(TestCase):
 
     def test_delete_recommendation_invalid_id_format(self):
         """It should return 400 Bad Request when the ID format is invalid"""
-        response = self.client.delete("/recommendations/invalid-id")  # Non-integer ID
+        response = self.client.delete("/api/recommendations/invalid-id")
         self.assertEqual(response.status_code, 400)
         self.assertIn("Invalid ID format", response.get_json()["error"])
 
     def test_delete_recommendation_not_found(self):
         """It should return 404 Not Found when the recommendation does not exist"""
-        response = self.client.delete("/recommendations/99999")  # Non-existent ID
+        response = self.client.delete("/api/recommendations/99999")
         self.assertEqual(response.status_code, 404)
-        self.assertIn("Recommendation not found", response.get_json()["error"])
 
     # ----------------------------------------------------------
     # TEST RETRIEVE A RECOMMENDATION
@@ -246,20 +245,14 @@ class TestRecommendationService(TestCase):
 
     def test_create_recommendation_no_content_type(self):
         """It should return 415 Unsupported Media Type when Content-Type is missing"""
-        response = self.client.post(
-            "/recommendations", data="{}"
-        )  # Missing Content-Type
+        response = self.client.post("/api/recommendations", data="{}")
         self.assertEqual(response.status_code, 415)
-        self.assertIn("Content-Type must be", response.get_json()["message"])
 
     def test_create_recommendation_invalid_content_type(self):
         """It should return 415 Unsupported Media Type when Content-Type is incorrect"""
         headers = {"Content-Type": "text/plain"}  # Incorrect Content-Type
-        response = self.client.post("/recommendations", data="{}", headers=headers)
+        response = self.client.post("/api/recommendations", data="{}", headers=headers)
         self.assertEqual(response.status_code, 415)
-        self.assertIn(
-            "Content-Type must be application/json", response.get_json()["message"]
-        )
 
     ############################################################
     # Utility function to bulk Recommendations

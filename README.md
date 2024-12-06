@@ -68,7 +68,7 @@ This repository is part of the New York University (NYU) masters class: **CSCI-G
 
 ### List/Query Recommendations
 
-- **Endpoint**: `/recommendations`
+- **Endpoint**: `/api/recommendations`
 - **Method**: `GET`
 - **Query Parameters**:
   - user_id (int): Filter by user ID
@@ -82,7 +82,7 @@ This repository is part of the New York University (NYU) masters class: **CSCI-G
 
 ### Like a Recommendation (Action)
 
-- **Endpoint**: `/recommendations/{id}/likes`
+- **Endpoint**: `/api/recommendations/{id}/likes`
 - **Method**: `POST`
 - **Description**: Increments the number of likes for a recommendation
 - **Response**:

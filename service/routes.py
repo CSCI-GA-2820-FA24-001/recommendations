@@ -45,7 +45,7 @@ def index():
 ######################################################################
 # CREATE A NEW RECOMMENDATION
 ######################################################################
-@app.route("/recommendations", methods=["POST"])
+@app.route("/api/recommendations", methods=["POST"])
 def create_recommendation():
     """
     Create a Recommendation
@@ -78,7 +78,7 @@ def create_recommendation():
 ######################################################################
 # RETRIEVE A RECOMMENDATION BY ID
 ######################################################################
-@app.route("/recommendations/<int:recommendation_id>", methods=["GET"])
+@app.route("/api/recommendations/<int:recommendation_id>", methods=["GET"])
 def get_recommendation(recommendation_id):
     """
     Retrieve a Recommendation
@@ -101,7 +101,7 @@ def get_recommendation(recommendation_id):
 ######################################################################
 # UPDATE AN EXISTING RECOMMENDATION
 ######################################################################
-@app.route("/recommendations/<int:recommendation_id>", methods=["PUT"])
+@app.route("/api/recommendations/<int:recommendation_id>", methods=["PUT"])
 def update_recommendation(recommendation_id):
     """
     Update a Recommendation
@@ -131,7 +131,7 @@ def update_recommendation(recommendation_id):
 ######################################################################
 # DELETE A RECOMMENDATION
 ######################################################################
-@app.route("/recommendations/<recommendation_id>", methods=["DELETE"])
+@app.route("/api/recommendations/<recommendation_id>", methods=["DELETE"])
 def delete_recommendation(recommendation_id):
     """
     Delete a Recommendation
@@ -164,7 +164,7 @@ def delete_recommendation(recommendation_id):
 ######################################################################
 # LIST ALL RECOMMENDATIONS
 ######################################################################
-@app.route("/recommendations", methods=["GET"])
+@app.route("/api/recommendations", methods=["GET"])
 def list_recommendations():
     """
     List all Recommendations
@@ -228,7 +228,7 @@ def list_recommendations():
 ######################################################################
 # FIND RECOMMENDATIONS BY FILTERS
 ######################################################################
-@app.route("/recommendations/filter", methods=["GET"])
+@app.route("/api/recommendations/filter", methods=["GET"])
 def find_recommendations_by_filters():
     """
     Find Recommendations by Filters
@@ -300,7 +300,7 @@ def check_content_type(content_type) -> None:
 ######################################################################
 # GET NUMBER OF LIKES FOR A RECOMMENDATION
 ######################################################################
-@app.route("/recommendations/<int:recommendation_id>/likes", methods=["GET"])
+@app.route("/api/recommendations/<int:recommendation_id>/likes", methods=["GET"])
 def get_recommendation_likes(recommendation_id):
     """
     Retrieve the number of likes for a Recommendation
@@ -327,7 +327,7 @@ def get_recommendation_likes(recommendation_id):
 ######################################################################
 # INCREMENT LIKES FOR A RECOMMENDATION
 ######################################################################
-@app.route("/recommendations/<int:recommendation_id>/likes", methods=["POST"])
+@app.route("/api/recommendations/<int:recommendation_id>/likes", methods=["POST"])
 def increment_recommendation_likes(recommendation_id):
     """
     Increment the number of likes for a Recommendation

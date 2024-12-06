@@ -55,7 +55,7 @@ $(function () {
 
         $.ajax({
             type: "POST",
-            url: "/recommendations",
+            url: "/api/recommendations",
             contentType: "application/json",
             data: JSON.stringify(data),
         })
@@ -90,7 +90,7 @@ $(function () {
 
         $.ajax({
             type: "PUT",
-            url: `/recommendations/${rec_id}`,
+            url: `/api/recommendations/${rec_id}`,
             contentType: "application/json",
             data: JSON.stringify(data),
         })
@@ -115,7 +115,7 @@ $(function () {
 
         $.ajax({
             type: "GET",
-            url: `/recommendations/${rec_id}`,
+            url: `/api/recommendations/${rec_id}`,
         })
             .done(function (res) {
                 $("#rec_user_id").val(res.user_id);
@@ -143,7 +143,7 @@ $(function () {
 
         $.ajax({
             type: "DELETE",
-            url: `/recommendations/${rec_id}`,
+            url: `/api/recommendations/${rec_id}`,
         })
             .done(function () {
                 clear_form_data();
@@ -169,7 +169,7 @@ $(function () {
 
         $.ajax({
             type: "GET",
-            url: `/recommendations/filter${queryString}`,
+            url: `/api/recommendations/filter${queryString}`,
         })
             .done(function (res) {
                 $("#search_results").empty();
@@ -217,10 +217,6 @@ $(function () {
         flash_message("Form cleared successfully.");
     });
 
-    $("#search-btn").click(function () {
-        recQuery()
-    });
-
     // ****************************************
     // Like a Recommendation
     // ****************************************
@@ -231,7 +227,7 @@ $(function () {
         
         let ajax = $.ajax({
             type: "POST",
-            url: `/recommendations/${recommendation_id}/likes`,
+            url: `/api/recommendations/${recommendation_id}/likes`,
             contentType: "application/json",
             data: ''
         });
@@ -245,4 +241,4 @@ $(function () {
             flash_message(res.responseJSON.message)
         });
     });
-})
+});
