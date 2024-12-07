@@ -64,6 +64,12 @@ recommendation_args.add_argument(
 recommendation_args.add_argument(
     "max_score", type=float, location="args", required=False, help="Maximum score"
 )
+recommendation_args.add_argument(
+    "from_date", type=str, location="args", required=False, help="Filter by from_date"
+)
+recommendation_args.add_argument(
+    "to_date", type=str, location="args", required=False, help="Filter by to_date"
+)
 
 
 ######################################################################
@@ -116,12 +122,23 @@ class RecommendationResource(Resource):
     def put(self, recommendation_id):
         """Update a Recommendation by its ID"""
         app.logger.info(f"Updating recommendation with id {recommendation_id}")
+
+        # Validate the ID format if the recommendation exists
+        if not recommendation_id.isdigit():
+            api.abort(
+                status.HTTP_400_BAD_REQUEST,
+                f"Invalid ID format: {recommendation_id}",
+            )
+
         recommendation = RecommendationModel.find(recommendation_id)
+
+        # If the recommendation doesn't exist, return a 404 error
         if not recommendation:
             api.abort(
                 status.HTTP_404_NOT_FOUND,
                 f"Recommendation with id {recommendation_id} not found.",
             )
+
         data = api.payload
         recommendation.deserialize(data)
         recommendation.update()
@@ -147,10 +164,8 @@ class RecommendationResource(Resource):
         # Convert to integer and find the recommendation
         recommendation = RecommendationModel.find(int(recommendation_id))
         if not recommendation:
-            app.logger.error(f"Recommendation with id [{recommendation_id}] not found.")
-            return {
-                "error": f"Recommendation with id {recommendation_id} not found."
-            }, status.HTTP_404_NOT_FOUND
+
+            return "", status.HTTP_404_NOT_FOUND
 
         # Delete the recommendation
         recommendation.delete()
@@ -173,6 +188,7 @@ class RecommendationCollection(Resource):
 
         try:
             # Parse query parameters
+            # args = recommendation_args.parse_args()
             args = recommendation_args.parse_args()
             user_id = args.get("user_id")
             product_id = args.get("product_id")
@@ -185,8 +201,15 @@ class RecommendationCollection(Resource):
 
             # Validate date formats
             if from_date:
+                app.logger.debug(
+                    f"Validating from_date: {from_date}"
+                )  # Debug: Log the from_date value
                 try:
+
                     from_date = datetime.strptime(from_date, "%Y-%m-%d")
+                    app.logger.debug(
+                        f"Validated from_date successfully: {from_date}"
+                    )  # Debug: Log the parsed date
                 except ValueError:
                     app.logger.error("Invalid from_date format: [%s]", from_date)
                     return {
