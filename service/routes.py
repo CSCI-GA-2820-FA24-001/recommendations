@@ -196,34 +196,34 @@ class RecommendationCollection(Resource):
             max_score = args.get("max_score")
             min_likes = request.args.get("min_likes", type=int)
             max_likes = request.args.get("max_likes", type=int)
-            from_date = request.args.get("from_date")
-            to_date = request.args.get("to_date")
+            # from_date = request.args.get("from_date")
+            # to_date = request.args.get("to_date")
 
-            # Validate date formats
-            if from_date:
-                app.logger.debug(
-                    f"Validating from_date: {from_date}"
-                )  # Debug: Log the from_date value
-                try:
+            # # Validate date formats
+            # if from_date:
+            #     app.logger.debug(
+            #         f"Validating from_date: {from_date}"
+            #     )  # Debug: Log the from_date value
+            #     try:
 
-                    from_date = datetime.strptime(from_date, "%Y-%m-%d")
-                    app.logger.debug(
-                        f"Validated from_date successfully: {from_date}"
-                    )  # Debug: Log the parsed date
-                except ValueError:
-                    app.logger.error("Invalid from_date format: [%s]", from_date)
-                    return {
-                        "error": "Invalid from_date format. Use YYYY-MM-DD."
-                    }, status.HTTP_400_BAD_REQUEST
+            #         from_date = datetime.strptime(from_date, "%Y-%m-%d")
+            #         app.logger.debug(
+            #             f"Validated from_date successfully: {from_date}"
+            #         )  # Debug: Log the parsed date
+            #     except ValueError:
+            #         app.logger.error("Invalid from_date format: [%s]", from_date)
+            #         return {
+            #             "error": "Invalid from_date format. Use YYYY-MM-DD."
+            #         }, status.HTTP_400_BAD_REQUEST
 
-            if to_date:
-                try:
-                    to_date = datetime.strptime(to_date, "%Y-%m-%d")
-                except ValueError:
-                    app.logger.error("Invalid to_date format: [%s]", to_date)
-                    return {
-                        "error": "Invalid to_date format. Use YYYY-MM-DD."
-                    }, status.HTTP_400_BAD_REQUEST
+            # if to_date:
+            #     try:
+            #         to_date = datetime.strptime(to_date, "%Y-%m-%d")
+            #     except ValueError:
+            #         app.logger.error("Invalid to_date format: [%s]", to_date)
+            #         return {
+            #             "error": "Invalid to_date format. Use YYYY-MM-DD."
+            #         }, status.HTTP_400_BAD_REQUEST
 
             # Start with base query
             query = RecommendationModel.query
@@ -241,10 +241,10 @@ class RecommendationCollection(Resource):
                 query = query.filter(RecommendationModel.num_likes >= min_likes)
             if max_likes is not None:
                 query = query.filter(RecommendationModel.num_likes <= max_likes)
-            if from_date:
-                query = query.filter(RecommendationModel.timestamp >= from_date)
-            if to_date:
-                query = query.filter(RecommendationModel.timestamp <= to_date)
+            # if from_date:
+            #     query = query.filter(RecommendationModel.timestamp >= from_date)
+            # if to_date:
+            #     query = query.filter(RecommendationModel.timestamp <= to_date)
 
             # Execute query
             recommendations = query.all()
