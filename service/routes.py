@@ -267,7 +267,7 @@ class RecommendationCollection(Resource):
     @api.doc("create_recommendation")
     @api.expect(create_model)
     @api.response(400, "Invalid data")
-    @api.marshal_with(recommendation_model)
+    @api.marshal_with(recommendation_model, code=201)
     def post(self):
         """Create a new Recommendation"""
         app.logger.info("Creating a new recommendation")
@@ -292,7 +292,7 @@ class RecommendationLikesResource(Resource):
 
     @api.doc("get_recommendation_likes")
     @api.response(404, "Recommendation not found")
-    @api.marshal_with(recommendation_model)
+    # @api.marshal_with(recommendation_model)
     def get(self, recommendation_id):
         """Get the number of likes for a Recommendation"""
         app.logger.info(f"Getting likes for recommendation id {recommendation_id}")
