@@ -583,7 +583,7 @@ class TestRecommendationService(TestCase):
 
     def test_delete_recommendation_invalid_id(self):
         """It should return 400 Bad Request for invalid ID format in DELETE"""
-        response = self.client.delete(f"/api/recommendations/invalid-id")
+        response = self.client.delete("/api/recommendations/invalid-id")
 
         # Verify the response status code
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
