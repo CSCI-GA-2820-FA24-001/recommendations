@@ -21,9 +21,8 @@ This service implements a REST API that allows you to Create, Read, Update,
 and Delete Recommendations
 """
 
-from flask import request
+from flask import request, current_app as app  # Group Flask imports together
 from flask_restx import Resource, fields, reqparse, Api
-from flask import current_app as app  # Import Flask application
 from service.models import RecommendationModel
 from service.common import status  # HTTP Status Codes
 
