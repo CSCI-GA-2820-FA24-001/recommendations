@@ -110,7 +110,7 @@ class RecommendationResource(Resource):
         if not recommendation:
             api.abort(
                 status.HTTP_404_NOT_FOUND,
-                f"Recommendation with id {recommendation_id} not found.",
+                f"404 Not Found",
             )
         return recommendation.serialize(), status.HTTP_200_OK
 
@@ -136,7 +136,7 @@ class RecommendationResource(Resource):
         if not recommendation:
             api.abort(
                 status.HTTP_404_NOT_FOUND,
-                f"Recommendation with id {recommendation_id} not found.",
+                f"404 Not Found",
             )
 
         data = api.payload
@@ -164,8 +164,7 @@ class RecommendationResource(Resource):
         # Convert to integer and find the recommendation
         recommendation = RecommendationModel.find(int(recommendation_id))
         if not recommendation:
-
-            return "", status.HTTP_404_NOT_FOUND
+            return "404 Not Found", status.HTTP_404_NOT_FOUND
 
         # Delete the recommendation
         recommendation.delete()
@@ -297,7 +296,7 @@ class RecommendationLikesResource(Resource):
         if not recommendation:
             api.abort(
                 status.HTTP_404_NOT_FOUND,
-                f"Recommendation with id {recommendation_id} not found.",
+                f"404 Not Found",
             )
         return {
             "id": recommendation_id,
@@ -318,7 +317,7 @@ class RecommendationLikesResource(Resource):
         if not recommendation:
             api.abort(
                 status.HTTP_404_NOT_FOUND,
-                f"Recommendation with id {recommendation_id} not found.",
+                f"404 Not Found",
             )
         recommendation.num_likes += 1
         recommendation.update()
