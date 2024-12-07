@@ -22,16 +22,26 @@ and Delete Recommendations
 """
 
 from flask import request
-from flask_restx import Resource, fields, reqparse
+from flask_restx import Resource, fields, reqparse, Api
 from flask import current_app as app  # Import Flask application
 from service.models import RecommendationModel
 from service.common import status  # HTTP Status Codes
-from . import api
 
 
 ######################################################################
 # Models
 ######################################################################
+api = Api(
+    app,
+    version="1.0.0",
+    title="Recommendations Demo RESTful Service",
+    description="Recommendations API",
+    default="recommendations",
+    default_label="Recommendations Operations",
+    doc="/apidocs",
+    prefix="/api",
+)
+
 create_model = api.model(
     "Recommendation",
     {
@@ -251,7 +261,7 @@ class RecommendationCollection(Resource):
             app.logger.info("Returning %d recommendations", len(results))
             return results, status.HTTP_200_OK
 
-        except Exception as e:
+        except ValueError as e:
             app.logger.error(f"Error while filtering recommendations: {e}")
             return {"error": "Invalid query parameters"}, status.HTTP_400_BAD_REQUEST
 
@@ -373,6 +383,6 @@ class RecommendationFilterResource(Resource):
 
             return results, status.HTTP_200_OK
 
-        except Exception as e:
+        except ValueError as e:
             app.logger.error(f"Error while filtering recommendations: {e}")
             return {"error": "Invalid query parameters"}, status.HTTP_400_BAD_REQUEST
