@@ -22,6 +22,7 @@ import sys
 from flask import Flask
 from service import config
 from service.common import log_handlers
+from flask_restx import fields, reqparse, Resource, Api
 
 
 ############################################################
@@ -36,8 +37,19 @@ def create_app():
     # Initialize Plugins
     # pylint: disable=import-outside-toplevel
     from service.models import db
-    db.init_app(app)
 
+    db.init_app(app)
+    global api
+    api = Api(
+        app,
+        version="1.0.0",
+        title="Recommendations Demo RESTful Service",
+        description="Recommendations API",
+        default="recommendations",
+        default_label="Recommendations Operations",
+        doc="/apidocs",
+        prefix="/api",
+    )
     with app.app_context():
         # Dependencies require we import the routes AFTER the Flask app is created
         # pylint: disable=wrong-import-position, wrong-import-order, unused-import

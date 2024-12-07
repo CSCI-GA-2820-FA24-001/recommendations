@@ -527,6 +527,7 @@ class TestRecommendationService(TestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         errors = response.get_json().get("errors", [])
+        print(errors)
         self.assertIn("min_score must be non-negative.", errors)
 
     def test_find_recommendations_score_range(self):

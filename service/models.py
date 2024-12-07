@@ -95,7 +95,7 @@ class RecommendationModel(db.Model):
             "user_id": self.user_id,
             "product_id": self.product_id,
             "score": self.score,
-            "timestamp": self.timestamp,
+            "timestamp": self.timestamp.isoformat() if self.timestamp else None,
             "num_likes": self.num_likes,
         }
 
