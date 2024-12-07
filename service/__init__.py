@@ -20,6 +20,7 @@ and SQL database
 """
 import sys
 from flask import Flask
+from flask_restx import fields, reqparse, Resource, Api
 from service import config
 from service.common import log_handlers
 
@@ -36,6 +37,7 @@ def create_app():
     # Initialize Plugins
     # pylint: disable=import-outside-toplevel
     from service.models import db
+
     db.init_app(app)
 
     with app.app_context():
