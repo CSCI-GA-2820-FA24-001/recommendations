@@ -21,10 +21,9 @@ This service implements a REST API that allows you to Create, Read, Update,
 and Delete Recommendations
 """
 
-from flask import Flask, request, jsonify
-from flask_restx import Api, Resource, fields, reqparse, inputs
+from flask import request, jsonify
+from flask_restx import Resource, fields, reqparse
 from flask import current_app as app  # Import Flask application
-from datetime import datetime
 from service.models import RecommendationModel
 from service.common import status  # HTTP Status Codes
 from . import api
@@ -110,7 +109,7 @@ class RecommendationResource(Resource):
         if not recommendation:
             api.abort(
                 status.HTTP_404_NOT_FOUND,
-                f"404 Not Found",
+                "404 Not Found",
             )
         return recommendation.serialize(), status.HTTP_200_OK
 
@@ -136,7 +135,7 @@ class RecommendationResource(Resource):
         if not recommendation:
             api.abort(
                 status.HTTP_404_NOT_FOUND,
-                f"404 Not Found",
+                "404 Not Found",
             )
 
         data = api.payload
@@ -296,7 +295,7 @@ class RecommendationLikesResource(Resource):
         if not recommendation:
             api.abort(
                 status.HTTP_404_NOT_FOUND,
-                f"404 Not Found",
+                "404 Not Found",
             )
         return {
             "id": recommendation_id,
@@ -317,7 +316,7 @@ class RecommendationLikesResource(Resource):
         if not recommendation:
             api.abort(
                 status.HTTP_404_NOT_FOUND,
-                f"404 Not Found",
+                "404 Not Found",
             )
         recommendation.num_likes += 1
         recommendation.update()
