@@ -292,6 +292,7 @@ class RecommendationLikesResource(Resource):
 
     @api.doc("get_recommendation_likes")
     @api.response(404, "Recommendation not found")
+    # @api.marshal_with(recommendation_model)
     def get(self, recommendation_id):
         """Get the number of likes for a Recommendation"""
         app.logger.info(f"Getting likes for recommendation id {recommendation_id}")
@@ -313,6 +314,7 @@ class RecommendationLikesResource(Resource):
 
     @api.doc("increment_recommendation_likes")
     @api.response(404, "Recommendation not found")
+    @api.marshal_with(recommendation_model)
     def post(self, recommendation_id):
         """Increment likes for a Recommendation"""
         app.logger.info(f"Incrementing likes for recommendation id {recommendation_id}")
