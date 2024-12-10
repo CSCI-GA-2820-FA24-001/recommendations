@@ -25,6 +25,7 @@ from flask import request, current_app as app  # Group Flask imports together
 from flask_restx import Resource, fields, reqparse, Api
 from service.models import RecommendationModel
 from service.common import status  # HTTP Status Codes
+from datetime import datetime
 
 
 ######################################################################
@@ -47,7 +48,9 @@ create_model = api.model(
         "user_id": fields.Integer(required=True, description="The User ID"),
         "product_id": fields.Integer(required=True, description="The Product ID"),
         "score": fields.Float(required=True, description="The Recommendation score"),
-        "timestamp": fields.String(description="The Recommendation timestamp"),
+        "timestamp": fields.DateTime(
+            description="The Recommendation timestamp", default=datetime.utcnow()
+        ),
         "num_likes": fields.Integer(default=0, description="Number of likes"),
     },
 )
