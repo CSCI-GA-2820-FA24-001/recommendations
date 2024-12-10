@@ -4,6 +4,7 @@ metadata:
   name: recommendations
 spec:
   type: ClusterIP
+  internalTrafficPolicy: Cluster
   selector:
     app: recommendations
   ports:
