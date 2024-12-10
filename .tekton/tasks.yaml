@@ -81,7 +81,7 @@ spec:
     This task is used to perform unit tests with pytest. It supports both `requirements.txt` and `poetry.lock` files.
     It also sources environment variables from a Kubernetes secret for database credentials.
   params:
-    - name: pytest-args
+    - name: PYTEST_ARGS
       description: The arguments to pass to the pytest CLI.
       type: array
       default: []
@@ -130,7 +130,7 @@ spec:
         pytest --version
         pytest
       args:
-        - "$(params.pytest-args)"
+        - "$(params.PYTEST_ARGS)"
 
 ---
 apiVersion: tekton.dev/v1beta1
