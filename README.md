@@ -4,7 +4,7 @@
 [![Python](https://img.shields.io/badge/Language-Python-blue.svg)](https://python.org/)
 [![codecov](https://codecov.io/github/CSCI-GA-2820-FA24-001/recommendations/graph/badge.svg?token=YPJ9148PKO)](https://codecov.io/github/CSCI-GA-2820-FA24-001/recommendations)
 [![Build Status](https://github.com/CSCI-GA-2820-FA24-001/recommendations/actions/workflows/ci.yml/badge.svg)](https://github.com/CSCI-GA-2820-FA24-001/recommendations/actions)
-[![Build Status](https://github.com/CSCI-GA-2820-FA24-001/recommendations/actions/workflows/bdd.yml/badge.svg)](https://github.com/CSCI-GA-2820-FA24-001/recommendations/actions)
+
 
 This is a skeleton you can use to start your projects
 
