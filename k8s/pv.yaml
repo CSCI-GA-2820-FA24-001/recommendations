@@ -1,16 +1,14 @@
-# comment out for openshift
-
-# apiVersion: v1
-# kind: PersistentVolume
-# metadata:
-#   name: pv0001
-# spec:
-#   capacity:
-#     storage: 1Gi
-#   volumeMode: Filesystem
-#   accessModes:
-#     - ReadWriteOnce
-#   persistentVolumeReclaimPolicy: Recycle
-#   hostPath:
-#     path: /data/pv0001
-#   storageClassName: "default"
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv0001
+spec:
+  capacity:
+    storage: 1Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Recycle
+  hostPath:
+    path: /data/pv0001
+  storageClassName: "default"
