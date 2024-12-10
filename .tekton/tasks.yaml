@@ -59,7 +59,7 @@ spec:
         python -m pip install --user pylint
 
         echo "***** Running Linting *****"
-        pylint $(params.args) "$(params.path)"
+        pylint $@ "$(params.path)"
 
 ---
 apiVersion: tekton.dev/v1beta1
@@ -81,7 +81,7 @@ spec:
     This task is used to perform unit tests with pytest. It supports both `requirements.txt` and `poetry.lock` files.
     It also sources environment variables from a Kubernetes secret for database credentials.
   params:
-    - name: PYTEST_ARGS
+    - name: pytest-args
       description: The arguments to pass to the pytest CLI.
       type: array
       default: []
@@ -127,7 +127,10 @@ spec:
         python -m pip install --user pytest
 
         echo "***** Running Tests *****"
-        pytest $(params.PYTEST_ARGS)
+        pytest --version
+        pytest
+      args:
+        - "$(params.pytest-args)"
 
 ---
 apiVersion: tekton.dev/v1beta1
