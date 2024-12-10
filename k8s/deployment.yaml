@@ -33,7 +33,7 @@ spec:
             valueFrom:
               secretKeyRef:
                 name: postgres-creds
-                key: database-uri
+                key: database_uri
         resources:
           limits:
             cpu: "0.50"
