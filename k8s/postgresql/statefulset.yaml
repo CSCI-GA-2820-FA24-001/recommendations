@@ -28,6 +28,16 @@ spec:
               secretKeyRef:
                 name: postgres-creds
                 key: password
+          - name: POSTGRES_USER
+            valueFrom:
+              configMapKeyRef:
+                name: postgres-config
+                key: postgres_user
+          - name: POSTGRES_DB
+            valueFrom:
+              configMapKeyRef:
+                name: postgres-config
+                key: postgres_db
           volumeMounts:
           - name: postgres-storage
             mountPath: /var/lib/postgresql/data
@@ -36,31 +46,7 @@ spec:
         persistentVolumeClaim:
           claimName: postgres-data
 
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: postgres-data
-spec:
-  accessModes:
-    - ReadWriteMany
-  resources:
-    requests:
-      storage: 1Gi
-  storageClassName: default
 
 
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: postgres
-  labels:
-    app: postgres
-spec:
-  type: ClusterIP
-  selector:
-    app: postgres
-  ports:
-    - port: 5432
-      targetPort: 5432
+
+
