@@ -141,7 +141,7 @@ metadata:
     app.kubernetes.io/version: "0.1"
   annotations:
     tekton.dev/categories: Deployment
-    tekton.dev/pipelines.minVersion: "0.17.0"
+    tekton.dev.pipelines.minVersion: "0.17.0"
     tekton.dev/tags: openshift, deploy
     tekton.dev.displayName: "deploy image"
     tekton.dev.platforms: "linux/amd64"
@@ -150,7 +150,7 @@ spec:
   - name: source  
   description: >-
     This task will update the deployment.yaml with the latest image name
-    and then apply that yaml file and it's service file.
+    and then apply that yaml file and its service file.
   params:
   - name: image_name
     description: The fully qualified name of the new image to deploy
@@ -169,7 +169,7 @@ spec:
           #!/bin/bash
           set -e
 
-          echo Applying manifests in $(inputs.params.manifest_dir) directory
+          echo "Applying manifests in $(params.manifest_dir) directory"
 
           echo "**********************************************************************"
           echo "Installing YQ..."
@@ -178,16 +178,15 @@ spec:
           chmod a+x /usr/bin/yq
 
           echo "*********************  DEPLOYMENT  ***********************"
-          echo "Deploying $(inputs.params.image_name) ..."
+          echo "Deploying $(params.image_name) ..."
 
-          yq -e -i '.spec.template.spec.containers[0].image="$(inputs.params.image_name)"' $(inputs.params.manifest_dir)/deployment.yaml
-          # sed -i 's|'"$(inputs.params.old_image_name)"'|'"$(inputs.params.image_name)"'|g' $(inputs.params.manifest_dir)/deployment.yaml
-          cat $(inputs.params.manifest_dir)/deployment.yaml
+          yq -e -i '.spec.template.spec.containers[0].image="$(params.image_name)"' $(params.manifest_dir)/deployment.yaml
+          cat $(params.manifest_dir)/deployment.yaml
 
           echo "************************************************************"
           echo "OC APPLY..."
-          oc apply -f $(inputs.params.manifest_dir)/deployment.yaml
-          oc apply -f $(inputs.params.manifest_dir)/service.yaml
+          oc apply -f $(params.manifest_dir)/deployment.yaml
+          oc apply -f $(params.manifest_dir)/service.yaml
 
           echo "************************************************************"
           sleep 3
